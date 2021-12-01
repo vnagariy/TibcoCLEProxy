@@ -1,0 +1,122 @@
+name: Deploy TibcoCLEProxy
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy:'
+        required: true
+        default: 'dev|sit|uat|prd'
+      ref:
+        description: 'Branch/tag/sha to deploy:'
+        required: false
+env:
+  APPLICATION: TibcoCLEProxy
+  COMMONLIB_VERSION: prod_v1.0.0  
+jobs:
+  initialize:
+    runs-on: [ self-hosted ]
+    outputs:
+      property_file: ${{ steps.variables.outputs.property_file }}
+      oc_yaml: ${{ steps.variables.outputs.oc_yaml }}
+    steps:
+      - name: Validate Environment Name
+        run: |
+          if [ "${{ github.event.inputs.environment }}" = "dev" ] || [ "${{ github.event.inputs.environment }}" = "sit" ] || [ "${{ github.event.inputs.environment }}" = "uat" ] || [ "${{ github.event.inputs.environment }}" = "prd" ]
+          then
+             echo "You are deploying to : ${{ github.event.inputs.environment }}"
+          else
+             echo "::error::You have enetered incorrect environment : ${{ github.event.inputs.environment }}"
+             echo "::error::Please provide the correct environment to deploy : dev|sit|uat|prd"
+             exit 1
+          fi
+      - name: Set ${{ github.event.inputs.environment }} Variables
+        id: variables
+        run: |
+          if [ "${{ github.event.inputs.environment }}" = "prd" ]
+          then
+             oc_yaml="TibcoCLEProxy-esb-prd.yaml"
+             property_file="TibcoCLEProxy-prd.properties"
+             echo "Setting oc_yaml=${oc_yaml} and property_file=${property_file}"
+             echo "::set-output name=property_file::$property_file"
+             echo "::set-output name=oc_yaml::$oc_yaml"
+          elif [ "${{ github.event.inputs.environment }}" = "uat" ]
+          then
+             oc_yaml="TibcoCLEProxy-esb-uat.yaml"
+             property_file="TibcoCLEProxy-uat.properties"          
+             echo "Setting oc_yaml=${oc_yaml} and property_file=${property_file}"
+             echo "::set-output name=property_file::$property_file"
+             echo "::set-output name=oc_yaml::$oc_yaml"
+          elif [ "${{ github.event.inputs.environment }}" = "sit" ]
+          then
+             oc_yaml="TibcoCLEProxy-esb-sit.yaml"
+             property_file="TibcoCLEProxy-sit.properties"
+             echo "Setting oc_yaml=${oc_yaml} and property_file=${property_file}"
+             echo "::set-output name=property_file::$property_file"
+             echo "::set-output name=oc_yaml::$oc_yaml"
+          elif [ "${{ github.event.inputs.environment }}" = "dev" ]
+          then
+             oc_yaml="TibcoCLEProxy-esb-dev.yaml"
+             property_file="TibcoCLEProxy-dev.properties"
+             echo "Setting oc_yaml=${oc_yaml} and property_file=${property_file}"
+             echo "::set-output name=property_file::$property_file"
+             echo "::set-output name=oc_yaml::$oc_yaml"
+          else
+             echo "::error::Environment specific variables could not be set!"
+             exit 1
+          fi 
+  build:
+    runs-on: [ self-hosted ]
+    environment: ${{ github.event.inputs.environment }}
+    needs: [initialize]
+    steps:
+      - name: Checkout ${{ env.APPLICATION }} Repository
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.inputs.ref }}
+      - name: 'Checkout CommonLib Version: ${{ env.COMMONLIB_VERSION }}'
+        uses: actions/checkout@v2
+        with:
+          repository: Enterprise-Intergration-Metcash/CommonLib
+          ref: ${{ env.COMMONLIB_VERSION }}
+          path: ./CommonLib
+          token: ${{ secrets.PAT }}
+      - name: SonarQube Analysis
+        run : |
+          sonar-scanner -D sonar.projectKey=${{ env.APPLICATION }} -D sonar.projectBaseDir=./sourcecode/${{ env.APPLICATION }}.module -D sonar.login=${{ secrets.SONAR_LOGIN }}
+
+      - name: Create report-task-https.txt with changed urls
+        run:  sed -i s/http\:/https\:/g build/sonar/report-task.txt
+          
+          
+      - name: SonarQube Quality Gate check
+        uses: sonarsource/sonarqube-quality-gate-action@master
+        # Force to fail step after specific time
+        timeout-minutes: 2
+        env:
+         SONAR_TOKEN: ${{ secrets.SONAR_LOGIN }}
+          
+      - name: Maven Build
+        run : |
+          oc login --server=${{ secrets.OC_HOST }} -u ${{ secrets.OC_LOGIN }} -p ${{ secrets.OC_PASSWORD }}
+          oc project tib-${{ github.event.inputs.environment }}
+          docker login -u ${{ secrets.OC_LOGIN }} -p $(oc whoami -t) ${{ secrets.OC_REGISTRY }}
+          mvn -B -f sourcecode/${{ env.APPLICATION }}.parent/pom.xml clean package initialize docker:build -Ddocker.property.file=docker-${{ github.event.inputs.environment }}.properties -Dk8s.property.file=k8s-${{ github.event.inputs.environment }}.properties docker:push -Ddocker.useOpenShiftAuth           
+  deploy:
+    runs-on: [ self-hosted ]
+    needs: [initialize, build]
+    env:
+      property_file: ${{ needs.initialize.outputs.property_file }}
+      oc_yaml: ${{ needs.initialize.outputs.oc_yaml }}
+    steps:
+      - name : Deploy to ${{ github.event.inputs.environment }}
+        run: |
+          oc project tib-${{ github.event.inputs.environment }}
+          oc delete deploymentconfig tibcocleproxy --ignore-not-found=true
+          oc delete route tibcocleproxy-eai-v1-8496 --ignore-not-found=true
+          oc delete route tibcocleproxy-esb-v1-8496 --ignore-not-found=true
+          oc delete service tibcocleproxy-v1-8496 --ignore-not-found=true
+          oc delete configmap tibcocleproxy-config --ignore-not-found=true
+          oc create configmap tibcocleproxy-config --from-env-file=deployment/${{ env.property_file }}
+          oc create -f deployment/${{ env.oc_yaml }}
+          echo "Deploy to ${{ github.event.inputs.environment }} completed"
