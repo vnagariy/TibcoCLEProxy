@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xs:schema xmlns:tns="http://metcash.com.au/ESB/Services/Reconsolidation/v3" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="http://metcash.com.au/ESB/Services/Reconsolidation/v3">
+    <xs:element name="ReConsolidation" type="tns:ReConsolidation"/>
+    <xs:complexType name="ReConsolidation">
+        <xs:all>
+            <xs:element name="InterfaceID" type="xs:string"/>
+            <xs:element name="ServiceName" type="xs:string"/>
+            <xs:element name="SrcSystemID" type="xs:string"/>
+            <xs:element name="DestSystemID" type="xs:string"/>
+            <xs:element name="DeliveryType" type="xs:string"/>
+            <xs:element minOccurs="0" name="DocumentType" type="xs:string"/>
+            <xs:element minOccurs="0" name="DocumentID" type="xs:string"/>
+            <xs:element minOccurs="0" name="SrcDir" type="xs:string"/>
+            <xs:element minOccurs="0" name="DestDir" type="xs:string"/>
+            <xs:element minOccurs="0" name="ArriveTime" type="xs:string"/>
+            <xs:element minOccurs="0" name="DeliverTime" type="xs:string"/>
+            <xs:element minOccurs="0" name="ErrorMsg" type="xs:string"/>
+            <xs:element name="Status" type="xs:string"/>
+            <xs:element name="DeliveredFlag" type="xs:boolean"/>
+            <xs:element name="CreatedBy" type="xs:string"/>
+            <xs:element name="CreatedTime" type="xs:string"/>
+            <xs:element minOccurs="0" name="ReferenceNumber" type="xs:string"/>
+            <xs:element minOccurs="0" name="ReferenceNumberType" type="xs:string"/>
+            <xs:element name="TransactionID" type="xs:string"/>
+        </xs:all>
+    </xs:complexType>
+</xs:schema>

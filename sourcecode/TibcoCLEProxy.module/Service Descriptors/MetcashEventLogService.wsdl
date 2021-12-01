@@ -1,0 +1,400 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--Created by TIBCO WSDL--><wsdl:definitions xmlns:ns0="http://metcash.com.au/ESB/Services/LogService/LogEvent/v1" xmlns:ns1="http://metcash.com.au/ESB/Common/ESBHeader/v1" xmlns:ns2="http://metcash.com.au/ESB/Common/Types/NameValue/v1" xmlns:ns3="http://metcash.com.au/ESB/Common/Types/ServiceIdentifier/v1" xmlns:ns4="http://metcash.com.au/ESB/Services/LogService/Common/Event/v1" xmlns:ns5="http://metcash.com.au/ESB/Services/LogService/Common/ApplicationContext/v1" xmlns:ns6="http://metcash.com.au/ESB/Services/LogService/Common/EventContext/v1" xmlns:ns7="http://metcash.com.au/ESB/Common/Types/TransactionContext/v1" xmlns:ns8="http://metcash.com.au/ESB/Services/LogService/Common/ResubmissionContext/v1" xmlns:ns9="http://metcash.com.au/ESB/Services/LogService/Common/ExceptionDetail/v1" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tibex="http://www.tibco.com/bs3.2/extensions" xmlns:tns="http://metcash.com.au/ESB/Services/LogService/Audit/Concrete/EventServices/v1" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" name="Untitled" targetNamespace="http://metcash.com.au/ESB/Services/LogService/Audit/Concrete/EventServices/v1" tibex:src="file:/C:/Projects/Metcash/WSDL/MetcashEventLogService.wsdl">
+    <wsdl:types>
+        <xsd:schema xmlns="http://metcash.com.au/ESB/Common/ESBHeader/v1" xmlns:nvparm="http://metcash.com.au/ESB/Common/Types/NameValue/v1" xmlns:svcid="http://metcash.com.au/ESB/Common/Types/ServiceIdentifier/v1" xmlns:txcxt="http://metcash.com.au/ESB/Common/Types/TransactionContext/v1" xmlns:xsd="http://www.w3.org/2001/XMLSchema" attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://metcash.com.au/ESB/Common/ESBHeader/v1" version="1.0" xml:lang="en">
+            <xsd:import namespace="http://metcash.com.au/ESB/Common/Types/ServiceIdentifier/v1"/>
+            <xsd:import namespace="http://metcash.com.au/ESB/Common/Types/NameValue/v1"/>
+            <xsd:import namespace="http://metcash.com.au/ESB/Common/Types/TransactionContext/v1"/>
+            <xsd:complexType name="StatusType">
+                <xsd:annotation>
+                    <xsd:documentation>A Status object contains information about processing status</xsd:documentation>
+                </xsd:annotation>
+                <xsd:sequence>
+                    <xsd:element name="State">
+                        <xsd:annotation>
+                            <xsd:documentation>The State element content is restricted to a fixed set of strings indicating the overall status. For example, "Success" and "Error" are defined as valid content.</xsd:documentation>
+                        </xsd:annotation>
+                        <xsd:simpleType>
+                            <xsd:restriction base="xsd:string">
+                                <xsd:enumeration value="Success"/>
+                                <xsd:enumeration value="Error"/>
+                            </xsd:restriction>
+                        </xsd:simpleType>
+                    </xsd:element>
+                    <xsd:element name="GeneratingService" type="svcid:ServiceIdentifierType">
+                        <xsd:annotation>
+                            <xsd:documentation>This is the service generating the status</xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                    <xsd:element minOccurs="0" name="StatusCode" type="xsd:string">
+                        <xsd:annotation>
+                            <xsd:documentation>StatusCode is a string which corresponds with a particular state. Often, a status code is associated with a message.</xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                    <xsd:element minOccurs="0" name="Message" type="xsd:string">
+                        <xsd:annotation>
+                            <xsd:documentation>An informational message providing further detail about status</xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                </xsd:sequence>
+            </xsd:complexType>
+            <xsd:element name="ESBHeader">
+                <xsd:annotation>
+                    <xsd:documentation>The root of the CIM is namespace controlled by version</xsd:documentation>
+                </xsd:annotation>
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="TransactionContext" type="txcxt:TransactionContextType">
+                            <xsd:annotation>
+                                <xsd:documentation>TransactionContext is used to manage correlating responses to request and log entries</xsd:documentation>
+                            </xsd:annotation>
+                        </xsd:element>
+                        <xsd:element name="SourceService" type="svcid:ServiceIdentifierType">
+                            <xsd:annotation>
+                                <xsd:documentation>The service which created the message</xsd:documentation>
+                            </xsd:annotation>
+                        </xsd:element>
+                        <xsd:element minOccurs="0" name="TargetService" type="svcid:ServiceIdentifierType">
+                            <xsd:annotation>
+                                <xsd:documentation>The service which is the target of this message</xsd:documentation>
+                            </xsd:annotation>
+                        </xsd:element>
+                        <xsd:element minOccurs="0" name="Status" type="ns1:StatusType">
+                            <xsd:annotation>
+                                <xsd:documentation>Optional generic status used in responses</xsd:documentation>
+                            </xsd:annotation>
+                        </xsd:element>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+        </xsd:schema>
+        <xsd:schema xmlns="http://metcash.com.au/ESB/Common/Types/NameValue/v1" xmlns:xsd="http://www.w3.org/2001/XMLSchema" attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://metcash.com.au/ESB/Common/Types/NameValue/v1" xml:lang="en">
+            <xsd:simpleType name="NameValuePrimitiveType">
+                <xsd:restriction base="xsd:string"/>
+            </xsd:simpleType>
+            <xsd:complexType name="NameValueStringType">
+                <xsd:annotation>
+                    <xsd:documentation>NameValueType defines an association between a name and a value. The value may is a string.</xsd:documentation>
+                </xsd:annotation>
+                <xsd:sequence>
+                    <xsd:element name="Value" type="ns2:NameValuePrimitiveType"/>
+                </xsd:sequence>
+                <xsd:attribute name="name" type="ns2:NameValuePrimitiveType" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>The name component is defined as a string attribute</xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:complexType>
+            <xsd:complexType name="NameValueType">
+                <xsd:annotation>
+                    <xsd:documentation>NameValueType defines an association between a name and a value. The value may be of any type.</xsd:documentation>
+                </xsd:annotation>
+                <xsd:sequence>
+                    <xsd:element name="Value" type="xsd:string"/>
+                </xsd:sequence>
+                <xsd:attribute name="name" type="ns2:NameValuePrimitiveType" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>The name component is defined as a string attribute</xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:complexType>
+        </xsd:schema>
+        <xsd:schema xmlns="http://metcash.com.au/ESB/Common/Types/ServiceIdentifier/v1" xmlns:xsd="http://www.w3.org/2001/XMLSchema" attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://metcash.com.au/ESB/Common/Types/ServiceIdentifier/v1">
+            <xsd:simpleType final="list union" name="NameIdentifierType">
+                <xsd:restriction base="xsd:string">
+                    <xsd:maxLength value="256"/>
+                </xsd:restriction>
+            </xsd:simpleType>
+            <xsd:simpleType final="list union" name="OperationIdentifierType">
+                <xsd:annotation>
+                    <xsd:documentation>Unique key for identifying an operation, for when service and version can be calculated automatically</xsd:documentation>
+                </xsd:annotation>
+                <xsd:restriction base="xsd:string"/>
+            </xsd:simpleType>
+            <xsd:complexType name="ServiceIdentifierType">
+                <xsd:annotation>
+                    <xsd:documentation>Unique key for identifying a service based on service, operation, and version.</xsd:documentation>
+                </xsd:annotation>
+                <xsd:sequence>
+                    <xsd:element name="ServiceName" type="ns3:NameIdentifierType"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:schema>
+        <xsd:schema xmlns="http://metcash.com.au/ESB/Services/LogService/Common/Event/v1" xmlns:app="http://metcash.com.au/ESB/Services/LogService/Common/ApplicationContext/v1" xmlns:event="http://metcash.com.au/ESB/Services/LogService/Common/EventContext/v1" xmlns:resub="http://metcash.com.au/ESB/Services/LogService/Common/ResubmissionContext/v1" xmlns:xsd="http://www.w3.org/2001/XMLSchema" attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://metcash.com.au/ESB/Services/LogService/Common/Event/v1">
+            <xsd:import namespace="http://metcash.com.au/ESB/Services/LogService/Common/ResubmissionContext/v1"/>
+            <xsd:import namespace="http://metcash.com.au/ESB/Services/LogService/Common/ApplicationContext/v1"/>
+            <xsd:import namespace="http://metcash.com.au/ESB/Services/LogService/Common/EventContext/v1"/>
+            <xsd:element name="Event">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element minOccurs="0" ref="resub:ResubmissionContext"/>
+                        <xsd:element minOccurs="0" ref="app:ApplicationContext"/>
+                        <xsd:element ref="event:EventContext"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+        </xsd:schema>
+        <xsd:schema xmlns="http://metcash.com.au/ESB/Services/LogService/Common/ApplicationContext/v1" xmlns:ns0="http://metcash.com.au/ESB/Common/Types/NameValue/v1" xmlns:xsd="http://www.w3.org/2001/XMLSchema" attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://metcash.com.au/ESB/Services/LogService/Common/ApplicationContext/v1">
+            <xsd:import namespace="http://metcash.com.au/ESB/Common/Types/NameValue/v1"/>
+            <xsd:complexType name="ProjectExtensionDataType">
+                <xsd:annotation>
+                    <xsd:documentation>NameValueType defines an association between a name and a value. The value may be of any type.</xsd:documentation>
+                </xsd:annotation>
+                <xsd:sequence>
+                    <xsd:element name="name" type="ns5:ProjectNameType"/>
+                    <xsd:element name="Value">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:any namespace="##other" processContents="lax"/>
+                            </xsd:sequence>
+                        </xsd:complexType>
+                    </xsd:element>
+                </xsd:sequence>
+            </xsd:complexType>
+            <xsd:simpleType name="ProjectNameType">
+                <xsd:restriction base="xsd:string"/>
+            </xsd:simpleType>
+            <xsd:element name="ApplicationContext">
+                <xsd:complexType>
+                    <xsd:choice>
+                        <xsd:element maxOccurs="unbounded" minOccurs="0" name="GenericExtensionData" type="ns0:NameValueStringType"/>
+                    </xsd:choice>
+                </xsd:complexType>
+            </xsd:element>
+        </xsd:schema>
+        <xsd:schema xmlns="http://metcash.com.au/ESB/Services/LogService/Common/EventContext/v1" xmlns:exception="http://metcash.com.au/ESB/Services/LogService/Common/ExceptionDetail/v1" xmlns:namevalue="http://metcash.com.au/ESB/Common/Types/NameValue/v1" xmlns:xsd="http://www.w3.org/2001/XMLSchema" attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://metcash.com.au/ESB/Services/LogService/Common/EventContext/v1">
+            <xsd:import namespace="http://metcash.com.au/ESB/Common/Types/NameValue/v1"/>
+            <xsd:import namespace="http://metcash.com.au/ESB/Services/LogService/Common/ExceptionDetail/v1"/>
+            <xsd:simpleType name="AuditStepType">
+                <xsd:restriction base="xsd:string">
+                    <xsd:enumeration value="begin"/>
+                    <xsd:enumeration value="end"/>
+                    <xsd:enumeration value="other"/>
+                </xsd:restriction>
+            </xsd:simpleType>
+            <xsd:simpleType name="AuditTextType">
+                <xsd:restriction base="xsd:string"/>
+            </xsd:simpleType>
+            <xsd:simpleType name="EngineNameDataType">
+                <xsd:restriction base="xsd:string"/>
+            </xsd:simpleType>
+            <xsd:complexType name="EventAnalysisDataType">
+                <xsd:sequence>
+                    <xsd:element maxOccurs="unbounded" name="AnalysisData" type="namevalue:NameValueType"/>
+                </xsd:sequence>
+            </xsd:complexType>
+            <xsd:simpleType name="EventRoleType">
+                <xsd:restriction base="xsd:string">
+                    <xsd:enumeration value="debug"/>
+                    <xsd:enumeration value="info"/>
+                    <xsd:enumeration value="warn"/>
+                    <xsd:enumeration value="error"/>
+                </xsd:restriction>
+            </xsd:simpleType>
+            <xsd:simpleType name="ProcessNameDataType">
+                <xsd:restriction base="xsd:string"/>
+            </xsd:simpleType>
+            <xsd:simpleType name="RequiredValueType">
+                <xsd:restriction base="xsd:string"/>
+            </xsd:simpleType>
+            <xsd:element name="EventContext">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="EventType" type="ns6:EventRoleType"/>
+                        <xsd:element name="Timestamp" type="xsd:dateTime"/>
+                        <xsd:element name="AuditStep" type="ns6:AuditStepType"/>
+                        <xsd:element name="AuditText" type="ns6:AuditTextType"/>
+                        <xsd:element name="Host" type="ns6:RequiredValueType"/>
+                        <xsd:element name="EngineName" type="ns6:EngineNameDataType"/>
+                        <xsd:element minOccurs="0" name="ProcessName" type="ns6:ProcessNameDataType"/>
+                        <xsd:element minOccurs="0" name="ProjectName" type="ns6:ProcessNameDataType"/>
+                        <xsd:element minOccurs="0" name="EventAnalysisData" type="ns6:EventAnalysisDataType"/>
+                        <xsd:element minOccurs="0" ref="exception:ExceptionDetail"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+        </xsd:schema>
+        <xsd:schema xmlns="http://metcash.com.au/ESB/Common/Types/TransactionContext/v1" xmlns:xsd="http://www.w3.org/2001/XMLSchema" attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://metcash.com.au/ESB/Common/Types/TransactionContext/v1">
+            <xsd:complexType name="TransactionContextType">
+                <xsd:annotation>
+                    <xsd:documentation>Comment describing your root element</xsd:documentation>
+                </xsd:annotation>
+                <xsd:sequence>
+                    <xsd:element name="TransactionID" type="ns7:TransactionIdType"/>
+                    <xsd:element minOccurs="0" name="CreationTime" type="xsd:dateTime">
+                        <xsd:annotation>
+                            <xsd:documentation>Default timezone is UTC for the standard dateTime data type. A timezone may be optionally specified but is not enforced.</xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                    <xsd:element default="0.0E0" minOccurs="0" name="ExpiryInterval">
+                        <xsd:annotation>
+                            <xsd:documentation>ExpiryInterval is the time in milliseconds after which the message should not be delivered.  0.00 means that the message should not expire</xsd:documentation>
+                        </xsd:annotation>
+                        <xsd:simpleType>
+                            <xsd:restriction base="xsd:double">
+                                <xsd:minInclusive value="0.0E0"/>
+                            </xsd:restriction>
+                        </xsd:simpleType>
+                    </xsd:element>
+                </xsd:sequence>
+            </xsd:complexType>
+            <xsd:simpleType name="TransactionIdType">
+                <xsd:restriction base="xsd:string"/>
+            </xsd:simpleType>
+        </xsd:schema>
+        <xsd:schema xmlns="http://metcash.com.au/ESB/Services/LogService/Common/ResubmissionContext/v1" xmlns:xsd="http://www.w3.org/2001/XMLSchema" attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://metcash.com.au/ESB/Services/LogService/Common/ResubmissionContext/v1">
+            <xsd:simpleType name="GenericDestinationType">
+                <xsd:restriction base="xsd:string"/>
+            </xsd:simpleType>
+            <xsd:simpleType name="PayloadType">
+                <xsd:restriction base="xsd:string"/>
+            </xsd:simpleType>
+            <xsd:simpleType name="TransportType">
+                <xsd:restriction base="xsd:string">
+                    <xsd:enumeration value="RV"/>
+                    <xsd:enumeration value="JMS"/>
+                    <xsd:enumeration value="File"/>
+                    <xsd:enumeration value="Other"/>
+                </xsd:restriction>
+            </xsd:simpleType>
+            <xsd:element name="ResubmissionContext">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element minOccurs="0" name="Transport" type="ns8:TransportType"/>
+                        <xsd:element minOccurs="0" name="Destination" type="ns8:GenericDestinationType"/>
+                        <xsd:element minOccurs="0" name="ReplyTo" type="ns8:GenericDestinationType"/>
+                        <xsd:element minOccurs="0" name="Payload" type="ns8:PayloadType"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+        </xsd:schema>
+        <xsd:schema xmlns="http://metcash.com.au/ESB/Services/LogService/Common/ExceptionDetail/v1" xmlns:xsd="http://www.w3.org/2001/XMLSchema" attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://metcash.com.au/ESB/Services/LogService/Common/ExceptionDetail/v1">
+            <xsd:simpleType name="AuditTextType">
+                <xsd:restriction base="xsd:string"/>
+            </xsd:simpleType>
+            <xsd:complexType name="BWExceptionDetailType">
+                <xsd:complexContent>
+                    <xsd:extension base="ns9:ExceptionDetailType">
+                        <xsd:sequence>
+                            <xsd:element name="AuditText" type="ns9:AuditTextType"/>
+                            <xsd:element minOccurs="0" name="RetryPossible" type="xsd:boolean"/>
+                        </xsd:sequence>
+                    </xsd:extension>
+                </xsd:complexContent>
+            </xsd:complexType>
+            <xsd:simpleType name="ExceptionCodeType">
+                <xsd:restriction base="xsd:string"/>
+            </xsd:simpleType>
+            <xsd:complexType name="ExceptionDetailType">
+                <xsd:sequence>
+                    <xsd:element name="ExceptionCode" type="ns9:ExceptionCodeType"/>
+                    <xsd:element name="ExceptionMessage" type="ns9:ExceptionMessageType"/>
+                    <xsd:element minOccurs="0" name="Stacktrace" type="ns9:StackValueType"/>
+                    <xsd:element minOccurs="0" name="ProcessStack" type="ns9:ProcessStackValueType"/>
+                </xsd:sequence>
+            </xsd:complexType>
+            <xsd:simpleType name="ExceptionMessageType">
+                <xsd:restriction base="xsd:string"/>
+            </xsd:simpleType>
+            <xsd:simpleType name="ProcessStackValueType">
+                <xsd:restriction base="xsd:string"/>
+            </xsd:simpleType>
+            <xsd:simpleType name="StackValueType">
+                <xsd:restriction base="xsd:string"/>
+            </xsd:simpleType>
+            <xsd:element name="BWExceptionDetail" type="ns9:BWExceptionDetailType"/>
+            <xsd:element name="ExceptionDetail" type="ns9:ExceptionDetailType"/>
+        </xsd:schema>
+        <xsd:schema xmlns="http://metcash.com.au/ESB/Services/LogService/LogEvent/v1" xmlns:event="http://metcash.com.au/ESB/Services/LogService/Common/Event/v1" xmlns:header="http://metcash.com.au/ESB/Common/ESBHeader/v1" xmlns:xsd="http://www.w3.org/2001/XMLSchema" attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://metcash.com.au/ESB/Services/LogService/LogEvent/v1">
+            <xsd:import namespace="http://metcash.com.au/ESB/Common/ESBHeader/v1"/>
+            <xsd:import namespace="http://metcash.com.au/ESB/Services/LogService/Common/Event/v1"/>
+            <xsd:complexType name="LogEventExceptionType">
+                <xsd:sequence>
+                    <xsd:element minOccurs="0" name="code" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="message" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="class" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="processStack" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="stackTrace" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+            <xsd:complexType name="LogEventSQLExceptionType">
+                <xsd:sequence>
+                    <xsd:element minOccurs="0" name="code" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="message" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="sqlState" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="detailStr" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+            <xsd:element name="LogEventException" type="ns0:LogEventExceptionType"/>
+            <xsd:element name="LogEventPub">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element ref="header:ESBHeader">
+                            <xsd:annotation>
+                                <xsd:documentation>The root of the CIM is namespace controlled by version</xsd:documentation>
+                            </xsd:annotation>
+                        </xsd:element>
+                        <xsd:element ref="event:Event"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="LogEventResponse">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element minOccurs="0" name="LogEventId" type="xsd:int"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="LogEventSQLException" type="ns0:LogEventSQLExceptionType"/>
+        </xsd:schema>
+    </wsdl:types>
+    <wsdl:service name="EventServices">
+        <wsdl:port binding="tns:operationsEndpointBinding" name="operationsEndpoint">
+            <soap:address location="http://localhost:7562/LogService/InterfaceServices/SOAP/Event/EventServices.serviceagent/operationsEndpoint"/>
+        </wsdl:port>
+    </wsdl:service>
+    <wsdl:portType name="operations">
+        <wsdl:operation name="logEvent">
+            <wsdl:input message="tns:LogEventRequest"/>
+            <wsdl:fault message="tns:LogEventFault" name="fault1"/>
+        </wsdl:operation>
+        <wsdl:operation name="syncLogEvent">
+            <wsdl:input message="tns:LogEventRequest"/>
+            <wsdl:output message="tns:LogEventResponse"/>
+            <wsdl:fault message="tns:LogEventFault" name="fault1"/>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="operationsEndpointBinding" type="tns:operations">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="logEvent">
+            <soap:operation soapAction="/LogService/InterfaceServices/SOAP/Event/EventServices.serviceagent//logEvent" style="document"/>
+            <wsdl:input>
+                <soap:body parts="input" use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="fault1">
+                <soap:fault name="fault1" use="literal"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="syncLogEvent">
+            <soap:operation soapAction="/LogService/InterfaceServices/SOAP/Event/EventServices.serviceagent//syncLogEvent" style="document"/>
+            <wsdl:input>
+                <soap:body parts="input" use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body parts="output" use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="fault1">
+                <soap:fault name="fault1" use="literal"/>
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:message name="LogEventRequest">
+        <wsdl:part element="ns0:LogEventPub" name="input"/>
+    </wsdl:message>
+    <wsdl:message name="LogEventFault">
+        <wsdl:part element="ns0:LogEventException" name="details"/>
+    </wsdl:message>
+    <wsdl:message name="LogEventResponse">
+        <wsdl:part element="ns0:LogEventResponse" name="output"/>
+    </wsdl:message>
+</wsdl:definitions>

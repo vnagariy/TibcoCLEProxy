@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xsd:schema xmlns="http://metcash.com.au/ESB/Services/LogService/Common/ExceptionDetail/v3"
+	 xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	 targetNamespace="http://metcash.com.au/ESB/Services/LogService/Common/ExceptionDetail/v3"
+	 elementFormDefault="qualified"
+	 attributeFormDefault="unqualified">
+	<xsd:simpleType name="ExceptionCodeType">
+		<xsd:restriction base="xsd:string">
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="ExceptionMessageType">
+		<xsd:restriction base="xsd:string">
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="AuditTextType">
+		<xsd:restriction base="xsd:string">
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="StackValueType">
+		<xsd:restriction base="xsd:string">
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="ProcessStackValueType">
+		<xsd:restriction base="xsd:string">
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:complexType name="ExceptionDetailType">
+		<xsd:sequence>
+			<xsd:element name="ExceptionCode" type="ExceptionCodeType"/>
+			<xsd:element name="ExceptionMessage" type="ExceptionMessageType"/>
+			<xsd:element name="Stacktrace" type="StackValueType" minOccurs="0"/>
+			<xsd:element name="ProcessStack" type="ProcessStackValueType" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="BWExceptionDetailType">
+		<xsd:complexContent>
+			<xsd:extension base="ExceptionDetailType">
+				<xsd:sequence>
+					<xsd:element name="AuditText" type="AuditTextType"/>
+					<xsd:element name="RetryPossible" type="xsd:boolean" minOccurs="0"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="ExceptionDetail" type="ExceptionDetailType"/>
+	<xsd:element name="BWExceptionDetail" type="BWExceptionDetailType"/>
+</xsd:schema>

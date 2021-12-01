@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	 xmlns="http://metcash.com.au/ESB/Services/CLE/v3"
+	 xmlns:header="http://metcash.com.au/ESB/Common/ESBHeader/v3"
+	 xmlns:event="http://metcash.com.au/ESB/Services/LogService/Common/Event/v3"
+	 targetNamespace="http://metcash.com.au/ESB/Services/CLE/v3"
+	 elementFormDefault="qualified"
+	 attributeFormDefault="unqualified">
+    <xsd:import namespace="http://metcash.com.au/ESB/Common/ESBHeader/v3" schemaLocation="../../Common/Header/ESBHeader.xsd"/>
+	<xsd:import namespace="http://metcash.com.au/ESB/Services/LogService/Common/Event/v3" schemaLocation="../LogService/Common/Event.xsd"/>
+	<xsd:element name="LogEventPub">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="header:ESBHeader"/>
+				<xsd:element ref="event:Event"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+</xsd:schema>

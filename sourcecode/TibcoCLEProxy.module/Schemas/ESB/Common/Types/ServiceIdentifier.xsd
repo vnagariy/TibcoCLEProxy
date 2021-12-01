@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xsd:schema xmlns="http://metcash.com.au/ESB/Common/Types/ServiceIdentifier/v3"
+	 xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	 targetNamespace="http://metcash.com.au/ESB/Common/Types/ServiceIdentifier/v3"
+	 elementFormDefault="qualified"
+	 attributeFormDefault="unqualified">
+	<xsd:complexType name="ServiceIdentifierType">
+		<xsd:annotation>
+			<xsd:documentation>Unique key for identifying a service based on service, operation, and version.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="ServiceName" type="NameIdentifierType"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:simpleType name="NameIdentifierType">
+			<xsd:restriction base="xsd:string">
+				<xsd:maxLength value="256"/>
+			</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="OperationIdentifierType">
+		<xsd:annotation>
+			<xsd:documentation>Unique key for identifying an operation, for when service and version can be calculated automatically</xsd:documentation>
+		</xsd:annotation>
+			<xsd:restriction base="xsd:string">
+			</xsd:restriction>
+	</xsd:simpleType>
+</xsd:schema>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xsd:schema xmlns="http://metcash.com.au/ESB/Services/LogService/Common/ResubmissionContext/v3"
+	 xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	 targetNamespace="http://metcash.com.au/ESB/Services/LogService/Common/ResubmissionContext/v3"
+	 elementFormDefault="qualified"
+	 attributeFormDefault="unqualified">
+	<xsd:element name="ResubmissionContext">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="Transport" type="TransportType" minOccurs="0"/>
+				<xsd:element name="Destination" type="GenericDestinationType" minOccurs="0"/>
+				<xsd:element name="ReplyTo" type="GenericDestinationType" minOccurs="0"/>
+				<xsd:element name="Payload" type="PayloadType" minOccurs="0"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:simpleType name="TransportType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="RV"/>
+			<xsd:enumeration value="JMS"/>
+			<xsd:enumeration value="File"/>
+			<xsd:enumeration value="Other"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="GenericDestinationType">
+		<xsd:restriction base="xsd:string">
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="PayloadType">
+		<xsd:restriction base="xsd:string"/>
+	</xsd:simpleType>
+</xsd:schema>

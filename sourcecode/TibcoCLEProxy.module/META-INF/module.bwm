@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sca:composite xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:BW="http://xsd.tns.tibco.com/amf/models/sca/implementationtype/BW" xmlns:XMLSchema="http://www.w3.org/2001/XMLSchema" xmlns:axis2="http://xsd.tns.tibco.com/bw/models/binding/soap/axis2" xmlns:compositeext="http://schemas.tibco.com/amx/3.0/compositeext" xmlns:property="http://ns.tibco.com/bw/property" xmlns:rest="http://xsd.tns.tibco.com/bw/models/binding/rest" xmlns:sca="http://www.osoa.org/xmlns/sca/1.0" xmlns:scact="http://xsd.tns.tibco.com/amf/models/sca/componentType" xmlns:scaext="http://xsd.tns.tibco.com/amf/models/sca/extensions" xmlns:schema_1616753030393="http://www.example.org/schema/1616753030393" xmlns:v1="http://metcash.com.au/ESB/Services/LogService/Audit/Concrete/EventServices/v1" xmlns:v1_1="http://metcash.com.au/ESB/Services/LogService/LogEvent/v1" xmlns:v2="http://metcash.com.au/ESB/Services/LogService/Audit/Concrete/EventServices/v2" xmi:id="_WVl5EI1TEeuxjdOGaB0vbw" targetNamespace="http://tns.tibco.com/bw/composite/TibcoCLEProxy.module" name="TibcoCLEProxy.module" compositeext:version="1.0.0" compositeext:formatVersion="2">
+  <sca:service xmi:id="_JayVgNPeEeu32ZN41TtLvA" name="api-cle-rest-v1" promote="ComponentCleProxyImpl/api-cle-rest-v1">
+    <sca:interface.wsdl xmi:id="_JayVhNPeEeu32ZN41TtLvA" interface="http://xmlns.example.com/20210612132832PLT#wsdl.interface(api-cle-rest-v12)" scaext:wsdlLocation="../Processes/com/metcash/tibcocleproxy/interface/CleProxyImpl.bwp"/>
+    <scaext:binding xsi:type="rest:RestServiceBinding" xmi:id="_JayVhdPeEeu32ZN41TtLvA" name="RestService" path="/api/cle/rest/v1" docBasePath="http://localhost:7777/TibcoCLEProxy.module" docResourcePath="CLEProxy" basePath="/" connector="com.metcash.tibcocleproxy.interface.HttpConnInterface" structuredData="true" technologyVersion="2.0" implementation="Service Descriptors/com.metcash.tibcocleproxy.interface.CleProxyImpl-CLEProxy.json">
+      <operation xmi:id="_JayVh9PeEeu32ZN41TtLvA" operationName="post" nickname="post-api-cle-rest-v1" httpMethod="POST" notes="postCLEProxy" responseStyle="element" outputPartName="item">
+        <clientFormat>json</clientFormat>
+        <clientRequestFormat>json</clientRequestFormat>
+      </operation>
+      <parameters xmi:id="_Ja4cINPeEeu32ZN41TtLvA"/>
+      <advancedConfig xmi:id="_JayVhtPeEeu32ZN41TtLvA" blockingQueueSize="2147483647"/>
+    </scaext:binding>
+    <scact:bindingAdjunct xmi:id="_JayViNPeEeu32ZN41TtLvA" bindingName="RestService"/>
+  </sca:service>
+  <sca:property xmi:id="_XjEY0I1TEeuxjdOGaB0vbw" name="BW.APPNODE.NAME" type="XMLSchema:string" scalable="true"/>
+  <sca:property xmi:id="_XjblMI1TEeuxjdOGaB0vbw" name="BW.DEPLOYMENTUNIT.NAME" type="XMLSchema:string" scalable="true"/>
+  <sca:property xmi:id="_XjkvII1TEeuxjdOGaB0vbw" name="BW.HOST.NAME" type="XMLSchema:string" scalable="true"/>
+  <sca:property xmi:id="_Xjt5EI1TEeuxjdOGaB0vbw" name="BW.DEPLOYMENTUNIT.VERSION" type="XMLSchema:string" scalable="true"/>
+  <sca:property xmi:id="_Xj2b8I1TEeuxjdOGaB0vbw" name="BW.MODULE.VERSION" type="XMLSchema:string" scalable="true"/>
+  <sca:property xmi:id="_XkAM8I1TEeuxjdOGaB0vbw" name="BW.CLOUD.PORT" type="XMLSchema:int" scalable="true"/>
+  <sca:property xmi:id="_XkG6oI1TEeuxjdOGaB0vbw" name="BW.MODULE.NAME" type="XMLSchema:string" scalable="true"/>
+  <sca:property xmi:id="_fxXIsMtIEeu6_4CKkTzKmA" name="/Properties/Interface/HTTPConnection/Host" type="XMLSchema:string" publicAccess="true" scalable="true"/>
+  <sca:property xmi:id="_iaoRAMtIEeu6_4CKkTzKmA" name="/Properties/Interface/HTTPConnection/Port" type="XMLSchema:int" scaext:simpleValue="0" publicAccess="true" scalable="true"/>
+  <sca:property xmi:id="_QIpGIBBOEey6e7riDMLAwg" name="/Properties/Interface/Auth/Token" type="XMLSchema:string" publicAccess="true" scalable="true"/>
+  <sca:property xmi:id="_Syp1UBBOEey6e7riDMLAwg" name="/Properties/Interface/Auth/Enabled" type="XMLSchema:boolean" scaext:simpleValue="false" publicAccess="true" scalable="true"/>
+  <sca:property xmi:id="_O3z8MMtJEeu6_4CKkTzKmA" name="/Properties/Backend/LegacyCLE/Enabled" type="XMLSchema:boolean" scaext:simpleValue="false" publicAccess="true" scalable="true"/>
+  <sca:property xmi:id="_NtF1gMtJEeu6_4CKkTzKmA" name="/Properties/Backend/LegacyCLE/HTTPClient/Host" type="XMLSchema:string" publicAccess="true" scalable="true"/>
+  <sca:property xmi:id="_OE6foMtJEeu6_4CKkTzKmA" name="/Properties/Backend/LegacyCLE/HTTPClient/Port" type="XMLSchema:int" publicAccess="true" scalable="true"/>
+  <sca:property xmi:id="_Ygn3MMwSEeuSKJ46Q-Uxgg" name="/Properties/Backend/LegacyCLE/HTTPClient/CertsPath" type="XMLSchema:string" publicAccess="true" scalable="true"/>
+  <sca:property xmi:id="_aSVscMwSEeuSKJ46Q-Uxgg" name="/Properties/Backend/LegacyCLE/HTTPClient/KeyStorePass" type="property:password" scaext:simpleValue="#!VxQfaGUHA0x0p8xVTCkv6Q==" publicAccess="true" scalable="true"/>
+  <sca:property xmi:id="_LLY3gMt6Eeu4V-qzPOE9hQ" name="/Properties/Backend/AzureMonitor/ApiVersion" type="XMLSchema:string" publicAccess="true" scalable="true"/>
+  <sca:property xmi:id="_2sTx4AlLEeyJiJscVCRLyQ" name="/Properties/Backend/AzureMonitor/CLE/Enabled" type="XMLSchema:boolean" publicAccess="true" scalable="true"/>
+  <sca:property xmi:id="_59vtcAlLEeyJiJscVCRLyQ" name="/Properties/Backend/AzureMonitor/CLE/SharedKey" type="XMLSchema:string" publicAccess="true" scalable="true"/>
+  <sca:property xmi:id="_6sCW0AlLEeyJiJscVCRLyQ" name="/Properties/Backend/AzureMonitor/CLE/WorkspaceID" type="XMLSchema:string" publicAccess="true" scalable="true"/>
+  <sca:property xmi:id="_9Bs_MAsjEeyekqNd5e5BGA" name="/Properties/Backend/AzureMonitor/CLE/HTTPClient/Host" type="XMLSchema:string" publicAccess="true" scalable="true"/>
+  <sca:property xmi:id="_CFIc0AskEeyekqNd5e5BGA" name="/Properties/Backend/AzureMonitor/CLE/HTTPClient/Port" type="XMLSchema:int" scaext:simpleValue="0" publicAccess="true" scalable="true"/>
+  <sca:property xmi:id="_0i4nQAlLEeyJiJscVCRLyQ" name="/Properties/Backend/AzureMonitor/Reconsolidation/Enabled" type="XMLSchema:boolean" scaext:simpleValue="false" publicAccess="true" scalable="true"/>
+  <sca:property xmi:id="__fPnIAlLEeyJiJscVCRLyQ" name="/Properties/Backend/AzureMonitor/Reconsolidation/SharedKey" type="XMLSchema:string" publicAccess="true" scalable="true"/>
+  <sca:property xmi:id="_ADCQsAlMEeyJiJscVCRLyQ" name="/Properties/Backend/AzureMonitor/Reconsolidation/WorkspaceID" type="XMLSchema:string" publicAccess="true" scalable="true"/>
+  <sca:property xmi:id="_-3KsAAsjEeyekqNd5e5BGA" name="/Properties/Backend/AzureMonitor/Reconsolidation/HTTPClient/Host" type="XMLSchema:string" publicAccess="true" scalable="true"/>
+  <sca:property xmi:id="_DZtqIAskEeyekqNd5e5BGA" name="/Properties/Backend/AzureMonitor/Reconsolidation/HTTPClient/Port" type="XMLSchema:int" scaext:simpleValue="0" publicAccess="true" scalable="true"/>
+  <sca:component xmi:id="_gL9csNPdEeu32ZN41TtLvA" name="ComponentCleProxyImpl" compositeext:version="1.0.0.qualifier">
+    <scaext:implementation xsi:type="BW:BWComponentImplementation" xmi:id="_gL9csdPdEeu32ZN41TtLvA" processName="com.metcash.tibcocleproxy.interface.CleProxyImpl"/>
+    <sca:service xmi:id="_JaxucNPeEeu32ZN41TtLvA" name="api-cle-rest-v1">
+      <sca:interface.wsdl xmi:id="_JaxucdPeEeu32ZN41TtLvA" interface="http://xmlns.example.com/20210612132832PLT#wsdl.interface(api-cle-rest-v12)" scaext:wsdlLocation="../Processes/com/metcash/tibcocleproxy/interface/CleProxyImpl.bwp"/>
+    </sca:service>
+  </sca:component>
+</sca:composite>

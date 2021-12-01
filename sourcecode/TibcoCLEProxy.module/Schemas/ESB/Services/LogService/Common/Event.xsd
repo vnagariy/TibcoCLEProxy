@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	 xmlns="http://metcash.com.au/ESB/Services/LogService/Common/Event/v3"
+	 xmlns:resub="http://metcash.com.au/ESB/Services/LogService/Common/ResubmissionContext/v3"
+	 xmlns:app="http://metcash.com.au/ESB/Services/LogService/Common/ApplicationContext/v3"
+	 xmlns:event="http://metcash.com.au/ESB/Services/LogService/Common/EventContext/v3"
+	 targetNamespace="http://metcash.com.au/ESB/Services/LogService/Common/Event/v3"
+	 elementFormDefault="qualified"
+	 attributeFormDefault="unqualified">
+	<xsd:import namespace="http://metcash.com.au/ESB/Services/LogService/Common/ResubmissionContext/v3" schemaLocation="ResubmissionContext.xsd"/>
+	<xsd:import namespace="http://metcash.com.au/ESB/Services/LogService/Common/ApplicationContext/v3" schemaLocation="ApplicationContext.xsd"/>
+	<xsd:import namespace="http://metcash.com.au/ESB/Services/LogService/Common/EventContext/v3" schemaLocation="EventContext.xsd"/>
+	<xsd:element name="Event">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="resub:ResubmissionContext" minOccurs="0"/>
+				<xsd:element ref="app:ApplicationContext" minOccurs="0"/>
+				<xsd:element ref="event:EventContext"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+</xsd:schema>

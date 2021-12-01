@@ -1,0 +1,5 @@
+{"records": [{
+    "jsonSchemaLocation": "/TibcoCLEProxy.module/Service Descriptors/com.metcash.tibcocleproxy.interface.CleProxyImpl-CLEProxy.json",
+    "conversionType": "linked",
+    "xsdSchemaTargetNamespace": "http://tns.tibco.com/bw/REST"
+}]}

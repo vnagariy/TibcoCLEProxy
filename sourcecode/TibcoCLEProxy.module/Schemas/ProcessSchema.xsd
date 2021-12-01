@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.metcash.com/ProcessSchema"
+	xmlns:tns="http://www.metcash.com/ProcessSchema" elementFormDefault="qualified">
+
+	<element name="messageBody" type="tns:messageBodyType" />
+	<simpleType name="messageBodyType">
+		<restriction base="string" />
+	</simpleType>
+	
+	<element name="Message" type="tns:messageType"></element>
+	<complexType name="messageType">
+		<sequence>
+			<element minOccurs="0" maxOccurs="1" name="TransactionID"
+				type="string" />
+			<element minOccurs="0" maxOccurs="1" name="MessageBody"
+				type="tns:messageBodyType" />
+		</sequence>
+	</complexType>
+	
+	<element name="TokenValid" type="tns:TokenValidType"></element>
+	<simpleType name="TokenValidType">
+		<restriction base="boolean"/>
+	</simpleType>
+	
+	<element name="RequestToken" type="tns:RequestTokenType" />
+	<simpleType name="RequestTokenType">
+		<restriction base="string" />
+	</simpleType>
+	
+	<element name="EventProcRequest" type="tns:EventProcRequestType"></element>
+	<complexType name="EventProcRequestType">
+		<sequence>
+			<element minOccurs="0" maxOccurs="1" name="TransactionID"
+				type="string" />
+			<element minOccurs="0" maxOccurs="1" name="LogEvent"
+				type="tns:messageBodyType" />
+		</sequence>
+	</complexType>
+	
+	<element name="EventProcResponse" type="tns:EventProcResponseType" />
+	<simpleType name="EventProcResponseType">
+		<restriction base="string" />
+	</simpleType>
+</schema>

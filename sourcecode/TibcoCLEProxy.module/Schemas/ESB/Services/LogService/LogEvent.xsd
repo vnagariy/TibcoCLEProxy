@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	 xmlns="http://metcash.com.au/ESB/Services/LogService/LogEvent/v3"
+	 xmlns:header="http://metcash.com.au/ESB/Common/ESBHeader/v3"
+	 xmlns:event="http://metcash.com.au/ESB/Services/LogService/Common/Event/v3"
+	 xmlns:recon="http://metcash.com.au/ESB/Services/Reconsolidation/v3"
+	 targetNamespace="http://metcash.com.au/ESB/Services/LogService/LogEvent/v3"
+	 elementFormDefault="qualified"
+	 attributeFormDefault="unqualified">
+    <xsd:import namespace="http://metcash.com.au/ESB/Common/ESBHeader/v3" schemaLocation="../../Common/Header/ESBHeader.xsd"/>
+	<xsd:import namespace="http://metcash.com.au/ESB/Services/LogService/Common/Event/v3" schemaLocation="../LogService/Common/Event.xsd"/>
+	<xsd:import 
+		namespace="http://metcash.com.au/ESB/Services/Reconsolidation/v3"
+		schemaLocation="../Reconsolidation/Reconsolidation.xsd" />
+	<xsd:element name="LogEventPub">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="header:ESBHeader"/>
+				<xsd:element ref="event:Event"/>
+				<xsd:element ref="recon:ReConsolidation" minOccurs="0" maxOccurs="1"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="LogEventExceptionType">
+		<xsd:sequence>
+			<xsd:element name="code" type="xsd:string" minOccurs="0"/>
+			<xsd:element name="message" type="xsd:string" minOccurs="0"/>
+			<xsd:element name="class" type="xsd:string" minOccurs="0"/>
+			<xsd:element name="processStack" type="xsd:string" minOccurs="0"/>
+			<xsd:element name="stackTrace" type="xsd:string" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="LogEventException" type="LogEventExceptionType"/>
+	<xsd:element name="LogEventResponse">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="LogEventId" type="xsd:int" minOccurs="0"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:complexType name="LogEventSQLExceptionType">
+		<xsd:sequence>
+			<xsd:element name="code" type="xsd:string" minOccurs="0"/>
+			<xsd:element name="message" type="xsd:string" minOccurs="0"/>
+			<xsd:element name="sqlState" type="xsd:string" minOccurs="0"/>
+			<xsd:element name="detailStr" type="xsd:string" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="LogEventSQLException" type="LogEventSQLExceptionType"/>
+
+</xsd:schema>

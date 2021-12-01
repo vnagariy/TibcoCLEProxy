@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xsd:schema xmlns="http://metcash.com.au/ESB/Common/Types/NameValue/v3"
+	 xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	 xml:lang="en"
+	 targetNamespace="http://metcash.com.au/ESB/Common/Types/NameValue/v3"
+	 elementFormDefault="qualified"
+	 attributeFormDefault="unqualified">
+	<xsd:complexType name="NameValueType">
+		<xsd:annotation>
+			<xsd:documentation>NameValueType defines an association between a name and a value. The value may be of any type.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Name" type="xsd:string"/>
+			<xsd:element name="Value" type="xsd:string"/>
+		</xsd:sequence>
+		<!--xsd:attribute name="name" type="NameValuePrimitiveType" use="required">
+			<xsd:annotation>
+				<xsd:documentation>The name component is defined as a string attribute</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute-->
+	</xsd:complexType>
+	<xsd:complexType name="NameValueStringType">
+		<xsd:annotation>
+			<xsd:documentation>NameValueType defines an association between a name and a value. The value may is a string.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Name" type="NameValuePrimitiveType"/>
+			<xsd:element name="Value" type="NameValuePrimitiveType"/>
+		</xsd:sequence>
+		<!--xsd:attribute name="name" type="NameValuePrimitiveType" use="required">
+			<xsd:annotation>
+				<xsd:documentation>The name component is defined as a string attribute</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute-->
+	</xsd:complexType>
+	<xsd:simpleType name="NameValuePrimitiveType">
+		<xsd:restriction base="xsd:string">
+		</xsd:restriction>
+	</xsd:simpleType>
+</xsd:schema>

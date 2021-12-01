@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xsd:schema xmlns="http://metcash.com.au/ESB/Services/LogService/Common/ApplicationContext/v3"
+	 xmlns:ns0="http://metcash.com.au/ESB/Common/Types/NameValue/v3"
+	 xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	 targetNamespace="http://metcash.com.au/ESB/Services/LogService/Common/ApplicationContext/v3"
+	 elementFormDefault="qualified"
+	 attributeFormDefault="unqualified">
+	<xsd:import namespace="http://metcash.com.au/ESB/Common/Types/NameValue/v3" schemaLocation="../../../Common/Types/NameValue.xsd"/>
+	<xsd:element name="ApplicationContext">
+		<xsd:complexType>
+			<xsd:choice>
+				<xsd:element name="GenericExtensionData" type="ns0:NameValueStringType" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:choice>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="ProjectExtensionDataType">
+		<xsd:annotation>
+			<xsd:documentation>NameValueType defines an association between a name and a value. The value may be of any type.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Name" type="ProjectNameType"/>
+			<xsd:element name="Value">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:any namespace="##other" processContents="lax"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:simpleType name="ProjectNameType">
+		<xsd:restriction base="xsd:string">
+		</xsd:restriction>
+	</xsd:simpleType>
+</xsd:schema>

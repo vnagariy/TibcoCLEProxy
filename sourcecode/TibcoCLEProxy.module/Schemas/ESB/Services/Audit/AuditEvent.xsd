@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xsd:schema xmlns="http://metcash.com.au/ESB/Audit/v3"
+	 xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	 targetNamespace="http://metcash.com.au/ESB/Audit/v3"
+	 elementFormDefault="qualified"
+	 attributeFormDefault="unqualified">
+	<xsd:element name="AuditEvent">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="AuditTimestamp" type="xsd:dateTime"/>
+				<xsd:element name="AuditText" type="xsd:string" minOccurs="0"/>
+				<xsd:element name="AuditStepId" type="xsd:string"/>
+				<xsd:element name="ApplicationId" type="xsd:string"/>
+				<xsd:element name="OutcomeId" type="xsd:string"/>
+				<xsd:element name="Participant" type="ParticipantType"/>
+				<xsd:element name="BusinessTransaction" type="BusinessTransactionType" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element name="AuditPayload" type="AuditPayloadType" minOccurs="0"/>
+				<xsd:element name="AdditonalContext" type="AuditContextType" minOccurs="0"/>
+				<xsd:element name="AuditStepDetails" type="AuditStepType" minOccurs="0"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="AuditEventResponse">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="AuditEventId" type="xsd:int" minOccurs="0"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="BusinessTransactionType">
+		<xsd:sequence>
+			<xsd:element name="ID" type="xsd:string"/>
+			<xsd:element name="IDQualifier" type="xsd:string"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="AuditPayloadType">
+		<xsd:sequence>
+			<xsd:element name="AuditPayloads" type="AuditPayloadsType" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="AuditPayloadsType">
+		<xsd:sequence>
+			<xsd:element name="payload" type="xsd:string"/>
+		</xsd:sequence>
+		<xsd:attribute name="qualifier" type="xsd:string"/>
+	</xsd:complexType>
+	<xsd:complexType name="AuditContextType">
+		<xsd:sequence>
+			<xsd:element name="AuditContexts" type="AuditContextsType" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="AuditContextsType">
+		<xsd:sequence>
+			<xsd:element name="value" type="xsd:string"/>
+		</xsd:sequence>
+		<xsd:attribute name="name" type="xsd:string"/>
+	</xsd:complexType>
+	<xsd:complexType name="ParticipantType">
+		<xsd:sequence>
+			<xsd:element name="ID" type="xsd:string"/>
+			<xsd:element name="IDQualifier" type="xsd:string"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="AuditStepType">
+		<xsd:sequence>
+			<xsd:element name="ID" type="xsd:string"/>
+			<xsd:element name="businessUseCase" type="xsd:string"/>
+			<xsd:element name="businessProcess" type="xsd:string"/>
+			<xsd:element name="businessProcessVersion" type="xsd:string"/>
+			<xsd:element name="activity" type="xsd:string"/>
+			<xsd:element name="activityType" type="xsd:string"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="AuditEventExceptionType">
+		<xsd:sequence>
+			<xsd:element name="code" type="xsd:string" minOccurs="0"/>
+			<xsd:element name="message" type="xsd:string" minOccurs="0"/>
+			<xsd:element name="class" type="xsd:string" minOccurs="0"/>
+			<xsd:element name="processStack" type="xsd:string" minOccurs="0"/>
+			<xsd:element name="stackTrace" type="xsd:string" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="AuditEventException" type="AuditEventExceptionType"/>
+	<xsd:complexType name="AuditSQLExceptionType">
+		<xsd:sequence>
+			<xsd:element name="code" type="xsd:string" minOccurs="0"/>
+			<xsd:element name="message" type="xsd:string" minOccurs="0"/>
+			<xsd:element name="sqlState" type="xsd:string" minOccurs="0"/>
+			<xsd:element name="detailStr" type="xsd:string" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="AuditSQLException" type="AuditSQLExceptionType"/>
+</xsd:schema>

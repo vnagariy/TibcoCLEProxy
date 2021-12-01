@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jndi:namedResource xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:http="http://xsd.tns.tibco.com/bw/models/sharedresource/httpclient" xmlns:jndi="http://xsd.tns.tibco.com/amf/models/sharedresource/jndi" xmi:id="_8aZAocsyEeuC7cH-CHWXXQ" name="com.metcash.tibcocleproxy.backend.HttpClientAzureCLE" type="http:HttpClientConfiguration">
+  <jndi:configuration xsi:type="http:HttpClientConfiguration" xmi:id="_8aaOwMsyEeuC7cH-CHWXXQ" httpClientVersion="httpcomponents" retryCount="3" idleConnectionTimeout="3000" useDefaultSSL="true" cmdExecutionIsolationStrategy="THREAD" cmdExecutionIsolationTimeout="1000" cmdExecutionTimeoutEnabled="true" cmdExecutionIsolationInterruptOnTimeout="true" cmdExecutionIsolationSemaphoreMaxConcRequests="8" cmdCircuitBreakerRequestVolumeThreshold="20" cmdCircuitBreakerSleepWindow="5000" cmdCircuitBreakerErrorThresholdPercentage="50" cmdMetricsRollingStatsTime="10000" cmdMetricsRollingStatsNumBuckets="10" cmdMetricsHealthSnapshotInterval="500" cmdRequestLogEnabled="true" tpCoreSize="10" tpMaxQueueSize="-1" tpQueueSizeRejectionThreshold="5" tpKeepAliveTime="1">
+    <tcpDetails xmi:id="_8aa10MsyEeuC7cH-CHWXXQ">
+      <substitutionBindings xmi:id="_wzoqYAskEeyekqNd5e5BGA" template="host" propName="/Properties/Backend/AzureMonitor/CLE/HTTPClient/Host"/>
+      <substitutionBindings xmi:id="_0_auUAskEeyekqNd5e5BGA" template="port" propName="/Properties/Backend/AzureMonitor/CLE/HTTPClient/Port"/>
+    </tcpDetails>
+  </jndi:configuration>
+</jndi:namedResource>

@@ -1,0 +1,373 @@
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  labels:
+    app: TibcoCLEProxy
+  name: tibcocleproxy
+  namespace: tib-uat
+spec:
+  replicas: 1
+  selector:
+    app: TibcoCLEProxy
+  strategy:
+    activeDeadlineSeconds: 21600
+    resources: {}
+    rollingParams:
+      intervalSeconds: 1
+      maxSurge: 25%
+      maxUnavailable: 25%
+      timeoutSeconds: 3600
+      updatePeriodSeconds: 1
+    type: Rolling
+  template:
+    metadata:
+      labels:
+        app: TibcoCLEProxy
+        container: tibcocleproxy
+      name: tibcocleproxy
+      namespace: tib-uat
+    spec:
+      containers:
+      - env:
+        - name: BW_LOGLEVEL
+          value: WARN
+        - name: CUSTOM_LOGBACK
+          value: 'true'
+        - name: BW_JAVA_OPTS
+          value: -Xmx1024M -Xms512M
+        - name: TZ
+          value: Australia/Sydney
+        envFrom:
+        - configMapRef:
+            name: tibcocleproxy-config
+        image: image-registry.openshift-image-registry.svc:5000/tib-uat/tibcocleproxy.application_1.0.0
+        imagePullPolicy: Always
+        name: tibcocleproxy
+        ports:
+        - containerPort: 8496
+          protocol: TCP
+        resources:
+          limits:
+            cpu: "1"
+            memory: 1024Mi
+          requests:
+            cpu: 50m
+            memory: 512Mi
+        volumeMounts:
+        - mountPath: /tibcodata
+          name: voltib
+          subPath: test
+        - mountPath: /resources/addons/certs/
+          name: certificate
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: voltib
+        persistentVolumeClaim:
+          claimName: tibcodata
+      - name: certificate
+        projected:
+          defaultMode: 420
+          sources:
+          - secret:
+              name: metcash-tibco-ssl
+  test: false
+  triggers:
+  - type: ConfigChange
+  - imageChangeParams:
+      automatic: true
+      containerNames:
+      - tibcocleproxy
+      from:
+        kind: ImageStreamTag
+        name: tibcocleproxy.application_1.0.0:latest
+        namespace: tib-uat
+    type: ImageChange
+---    
+apiVersion: v1
+kind: Service
+metadata:
+  name: tibcocleproxy-v1-8496
+  labels:
+    app: tibcocleproxy-v1-8496
+  namespace: tib-uat
+spec:
+    type: ClusterIP
+    ports:
+    -   name: tibcocleproxy-v1-8496
+        port: 80
+        protocol: TCP
+        targetPort: 8496
+    selector:
+        app: TibcoCLEProxy
+---              
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  labels:
+    app: tibcocleproxy-eai-v1-8496
+  name: tibcocleproxy-eai-v1-8496
+  namespace: tib-uat
+spec:
+  host: eai-uat.metcash.com
+  path: /api/cle/rest/v1
+  port:
+    targetPort: tibcocleproxy-v1-8496
+  tls:
+    caCertificate: |-
+      -----BEGIN CERTIFICATE-----
+      MIID1zCCAr+gAwIBAgIKUGbVQgAAAAAABzANBgkqhkiG9w0BAQsFADBSMQswCQYD
+      VQQGEwJBVTEgMB4GA1UEChMXTWV0Y2FzaCBUcmFkaW5nIExpbWl0ZWQxCzAJBgNV
+      BAsTAklUMRQwEgYDVQQDEwtDRkNBUk9PVC1DQTAeFw0xNzAyMDYwNjUxMDVaFw0y
+      NzAzMjAyMzQ2MDBaME0xEzARBgoJkiaJk/IsZAEZFgNjb20xFzAVBgoJkiaJk/Is
+      ZAEZFgdtZXRjYXNoMR0wGwYDVQQDExRtZXRjYXNoLUNGQ0FTVUIwMS1DQTCCASIw
+      DQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAOcY7F7GMlOW75SxEp3qJ8n3xLYI
+      hdU3c7ETV6sFbvGRwtaOl2LqMEbH3HzhI7BDxKVUsAe3JvPy+kjgXC9Oh0Z3deCI
+      72BCGc09El4bbMIFvjFMwTBr+4kVxTOADiKAchLjJ6tHkbaf5mUiMRx6cHFe6qSn
+      qNMWqhctWR6qGcesLTNa2UkY8MpUfrF714VtqdfOEuMkpJlDRsY9cmWqrr6EAHJN
+      MdKIuqNhxzhO/XM/ISWqRQkAC8tFzQxl57tyo4pc4RN2hzTcbaDdxLDrgr+0EV4Z
+      GZcmx7r74Py58PLKvQwWfn0R+G7e4k9/RwxpIiZJWNLoUAdyBH8pFpPIVIkCAwEA
+      AaOBszCBsDAQBgkrBgEEAYI3FQEEAwIBAjAjBgkrBgEEAYI3FQIEFgQUpt5Kcjeh
+      CDWqiA+EbSxYAW19MewwHQYDVR0OBBYEFCWv9+zrzsZbQCphfKxbvw7RE4qCMBkG
+      CSsGAQQBgjcUAgQMHgoAUwB1AGIAQwBBMAsGA1UdDwQEAwIBhjAPBgNVHRMBAf8E
+      BTADAQH/MB8GA1UdIwQYMBaAFNXAeTdIjrP9vi+hjU5as73zIDssMA0GCSqGSIb3
+      DQEBCwUAA4IBAQAHsVMpuRrkpc+VNEMV3qO5ipbEwTDqyV/YZbVH8K38Am3iY6ZZ
+      rUIUxIKv3d0cTy2afhJ5kXbHqNQgjbZPxYj0uJ0n1CdgWhGJyhPWmKOId45OJ/cK
+      512tMy/q+cw4EZGeoZ47AUa9snDf/Mmjq8q/JYOS6C+CRk82bNuS41asm2i1WHWu
+      a9NBtnwCBOZqbzVV5jzC46ZDiTMt+A3kALpSBxlHdZFtT0nzQONbyulkZEcAoKrU
+      HKhPxBvesKjivAlgM+6Th02sdWPuwWU9Z16zFrCzio7kErgAhfU6WiLpUC0p9BJg
+      7A4CjgPeyc3oQ8F/msUzsvgNxLgkzLUYnQBy
+      -----END CERTIFICATE-----
+      -----BEGIN CERTIFICATE-----
+      MIIDfzCCAmegAwIBAgIQBWM9+y6w8ZxIwU09IqKJwDANBgkqhkiG9w0BAQUFADBS
+      MQswCQYDVQQGEwJBVTEgMB4GA1UEChMXTWV0Y2FzaCBUcmFkaW5nIExpbWl0ZWQx
+      CzAJBgNVBAsTAklUMRQwEgYDVQQDEwtDRkNBUk9PVC1DQTAeFw0xMjAzMjAyMzM2
+      MDFaFw0yNzAzMjAyMzQ2MDBaMFIxCzAJBgNVBAYTAkFVMSAwHgYDVQQKExdNZXRj
+      YXNoIFRyYWRpbmcgTGltaXRlZDELMAkGA1UECxMCSVQxFDASBgNVBAMTC0NGQ0FS
+      T09ULUNBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAniHi1krCALUv
+      X57UiL5LWKE1RaVW8ImaAJBCcwDhIZtX5wGiS29sYLa4ms5bnEMftSRtF2rF3l9K
+      AfDkBhjzNx0mF8nALQHwOA96TyuiVErFqufDz6RBzA1L2BmtwNuqQ59mvayQvvKK
+      7zPXTkmspexDdixqA+maEyg+NBM3jpW9uQGihNSEs8iJln23OLPBrsMwmInohwkp
+      IGNW5RjDPKwlbwQPSmbwbOR/M7cmiMHhf7CSVlzJAN8GoLlAS//OkgAiyrJJGxdY
+      zLz00hijIgnclLQED4h6XKIraTtlPemK4KP8Zx/PbpoIGDCkyRHuOfhDWoEO9+zw
+      wVW7MoHczwIDAQABo1EwTzALBgNVHQ8EBAMCAYYwDwYDVR0TAQH/BAUwAwEB/zAd
+      BgNVHQ4EFgQU1cB5N0iOs/2+L6GNTlqzvfMgOywwEAYJKwYBBAGCNxUBBAMCAQAw
+      DQYJKoZIhvcNAQEFBQADggEBACYouWYrjAqyocfO6EyaKYFuLXer6bKq8ePLO2QJ
+      3LBBV0LZNmmXOLIlrZqH8Eo33ZOsrfwE2yaCA4SZpAwkHmyzR2z1OWzOXfHsnYB6
+      vmuYOrKV4sUtf0IWKN30uN0Cx25JnNZTg6qQAuHYBiJOLZ44z0yZPazSU3T+aoP8
+      +08ed2rKp2SnO23uXjBhuVDsbz8wMbrWlS9Eq7WAEXEDgeGVkFVLexgGnhZlEv+z
+      bJMdqloBinsl+vqFeIFUXNwXG0KW37I8bKNmc0TPKkzhHQJQbfqVNRfxy1i0qYvX
+      DtNIN1nwsSu34HZVDmfKOzZaqwrpZib7l3ZAavPqUc8vdz4=
+      -----END CERTIFICATE-----
+    certificate: |-
+      -----BEGIN CERTIFICATE-----
+      MIIHFTCCBf2gAwIBAgIKFvLjMQACAA4/MDANBgkqhkiG9w0BAQsFADBNMRMwEQYK
+      CZImiZPyLGQBGRYDY29tMRcwFQYKCZImiZPyLGQBGRYHbWV0Y2FzaDEdMBsGA1UE
+      AxMUbWV0Y2FzaC1DRkNBU1VCMDEtQ0EwHhcNMTkwNjIwMDc0ODI5WhcNMjQwNjE4
+      MDc0ODI5WjCBvTELMAkGA1UEBhMCQVUxDDAKBgNVBAgTA05TVzEXMBUGA1UEBxMO
+      TWFjUXVhcmllIFBhcmsxIDAeBgNVBAoTF01FVENBU0ggVFJBRElORyBMSU1JVEVE
+      MQ8wDQYDVQQLEwZJVCBFQUkxJTAjBgNVBAMMHCouYXBwcy5vcGVuc2hpZnQubWV0
+      Y2FzaC5jb20xLTArBgkqhkiG9w0BCQEWHkludGVncmF0aW9uU3VwcG9ydEBtZXRj
+      YXNoLmNvbTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBANHnkyYj2Bqm
+      gOEW4tRK9TQumEqHh7aDOd6pQ60rC92u8ZP60A26WWUcCtDT52oDlf1/Txg5vkvh
+      xOTBnHXAQGhy3tIu76CzmkywKTCAxukPVsUFKlvUfknviphsVdQDH/36QqAykr/S
+      QuFQNjniVmVQ3PlGES5wGglWyjXw/r2c+tv/rlIcxLDCJoOvaBdSUEfrmvr3qbV2
+      2mw833bpFNXiRVlCTqSCMhEuVpk9IKJJ6jHMLakyjOyQl56c8fa83gmN/9cULpmQ
+      Dq2zWhAT9B3LFDyTARHUSEbY1nlzNyn0ZvtL3rg/k6/8RkcRPXb5uZPBlvczb68p
+      STWAVsb3LTkCAwEAAaOCA4QwggOAMB0GA1UdDgQWBBRnxitZij/iHMjUTdLor4VR
+      moYh2TAfBgNVHSMEGDAWgBQlr/fs687GW0AqYXysW78O0ROKgjCCARsGA1UdHwSC
+      ARIwggEOMIIBCqCCAQagggEChoG9bGRhcDovLy9DTj1tZXRjYXNoLUNGQ0FTVUIw
+      MS1DQSxDTj1DRkNBU3ViMDEsQ049Q0RQLENOPVB1YmxpYyUyMEtleSUyMFNlcnZp
+      Y2VzLENOPVNlcnZpY2VzLENOPUNvbmZpZ3VyYXRpb24sREM9bWV0Y2FzaCxEQz1j
+      b20/Y2VydGlmaWNhdGVSZXZvY2F0aW9uTGlzdD9iYXNlP29iamVjdENsYXNzPWNS
+      TERpc3RyaWJ1dGlvblBvaW50hkBodHRwOi8vY2ZjYXN1YjAxLm1ldGNhc2guY29t
+      L0NlcnRFbnJvbGwvbWV0Y2FzaC1DRkNBU1VCMDEtQ0EuY3JsMIIBXQYIKwYBBQUH
+      AQEEggFPMIIBSzCBswYIKwYBBQUHMAKGgaZsZGFwOi8vL0NOPW1ldGNhc2gtQ0ZD
+      QVNVQjAxLUNBLENOPUFJQSxDTj1QdWJsaWMlMjBLZXklMjBTZXJ2aWNlcyxDTj1T
+      ZXJ2aWNlcyxDTj1Db25maWd1cmF0aW9uLERDPW1ldGNhc2gsREM9Y29tP2NBQ2Vy
+      dGlmaWNhdGU/YmFzZT9vYmplY3RDbGFzcz1jZXJ0aWZpY2F0aW9uQXV0aG9yaXR5
+      MGUGCCsGAQUFBzAChllodHRwOi8vY2ZjYXN1YjAxLm1ldGNhc2guY29tL0NlcnRF
+      bnJvbGwvQ0ZDQVN1YjAxLm1ldGNhc2guY29tX21ldGNhc2gtQ0ZDQVNVQjAxLUNB
+      KDIpLmNydDAsBggrBgEFBQcwAYYgaHR0cDovL2NmY2FvcjAxLm1ldGNhc2guY29t
+      L29jc3AwDgYDVR0PAQH/BAQDAgTwMD0GCSsGAQQBgjcVBwQwMC4GJisGAQQBgjcV
+      CIPcuVSFj6ZegaWTDYPP7lqBqOd9cYWemlmFvLwhAgFlAgEAMB0GA1UdJQQWMBQG
+      CCsGAQUFBwMCBggrBgEFBQcDATAnBgkrBgEEAYI3FQoEGjAYMAoGCCsGAQUFBwMC
+      MAoGCCsGAQUFBwMBMCcGA1UdEQQgMB6CHCouYXBwcy5vcGVuc2hpZnQubWV0Y2Fz
+      aC5jb20wDQYJKoZIhvcNAQELBQADggEBAE7J+QDySHwdAQ7S29I4h40BP3o6Pg6x
+      ziqIQVubuTz5mVLfiL5E2TLuyF3bWkmUBbWVUn9A0fJ1U+yDYPoCkNCCuLynAzBc
+      p4dRNbZRbCM+LnxVsm74eGiPGGVajF38b3LgQTVrmtKhZmdK5HgJLaxDDBCz0XB7
+      +Pdlrh8U3z8x0hQkjNZGxsroekAbTEYcVZr5YkJibUUYr89r9VuXSzWNz5hyLEZb
+      eL+ECoM9Q4mL9PhAgRD9uLQYUmNJr+HvFbAy5rGiZSSI79naZOA8MzDlE/SzbHJ7
+      OnB7ZTL9+uNYg82LLPutWXad7YVBW6gTeSyt0H6rZqsCHU9IHnsxPcE=
+      -----END CERTIFICATE-----
+    key: |-
+      -----BEGIN RSA PRIVATE KEY-----
+      MIIEogIBAAKCAQEA0eeTJiPYGqaA4Rbi1Er1NC6YSoeHtoM53qlDrSsL3a7xk/rQ
+      DbpZZRwK0NPnagOV/X9PGDm+S+HE5MGcdcBAaHLe0i7voLOaTLApMIDG6Q9WxQUq
+      W9R+Se+KmGxV1AMf/fpCoDKSv9JC4VA2OeJWZVDc+UYRLnAaCVbKNfD+vZz62/+u
+      UhzEsMImg69oF1JQR+ua+veptXbabDzfdukU1eJFWUJOpIIyES5WmT0goknqMcwt
+      qTKM7JCXnpzx9rzeCY3/1xQumZAOrbNaEBP0HcsUPJMBEdRIRtjWeXM3KfRm+0ve
+      uD+Tr/xGRxE9dvm5k8GW9zNvrylJNYBWxvctOQIDAQABAoIBAE2vVh90fqOGYgZs
+      UPDe+Rch840J0elzcbR9kqWBW/fkqlXpKp0aDcHE+h/FfU0YHKfgOSavIEW3Pgan
+      vT87Mts1QFArvNYOAppFTEk+L9/LpIJwYffwkfjNJc85sR4xNeLqf0QI05UYvVXk
+      ON19bho7Lj03eF5mcMxqCZajJbSIu+zsNm9BQ9tz8DZ68Kn2dTJD20nd7RJdEGhz
+      hykz5lpt0Jk+Xe1uHiVAsEYw/jVuZH+tpBys6oBIJ4geO3AIhW68Z9R1Xnk5LKxx
+      YuAAtILWrf+7bAPJxIAQ/eEYrxKLy4sK9LZMmK6q6HdJ8YCYlKoKtpmHa8ZRNIvU
+      escjz40CgYEA8u3vUeASapIaMPBXnV1uTqTS52q79H0EF08I0B8BTMNUdnSHxbNZ
+      QJbmsCXHCwUuT47FW6CuvpHFU7JGsdeSih0+NtJ7B2PM8x8aDyBSc257LbnUr8gO
+      2M0CHU+N0iNtgJTn+E2MqXTTDWRvf6amA+cru3a+/Wp0Bcq40sBCdt8CgYEA3TLD
+      CO7h7VDt8HZ20hgewwJspXHCkwKeaFREWYNLXj/UwWIQYjWFZ8eHu1GOrBh732Nk
+      VfNv62NYyEjcQWKu3duCtHAlkj9sWbzehDjvUH9nMiv4YXHm3oAv+RIECw5pnu0q
+      j1baZk6rjE5g7abYyfbE5xlApDx8ffO+wnXRVucCgYAh7YssEzBfQ/J2fUqvRro+
+      L5TpDyYa+k7U9ovTjVEAKJOmS5YezXKcq7aiSVRoPJwALn9v0Zw2L2Ow0cg/1Ey6
+      D2V+AJ2AJbcdCW35SNlbF8YKV9bVigpQyykNcOvsulfzylgvfJ01mYRUbX+JA3xS
+      NToNX4NDH1f+6xYvEPz3XwKBgCovqzjB7n7HR4nr3f91sDA6/yOSjaxh/HojUCHO
+      Q4qHG/mBzWQdlwLS8BUOmepChSV2nEU0N20qNl2EX9Vsj7MqUUQ+ezvoMq7usXWA
+      Mkwk8DaGYkmbYo+e3QdgozrElepEizBpPR/z8w3ASQYqIwBpuuXkUArCqm+PFBuc
+      Qr+TAoGAaghDtoTzbGrvIvKX+q2H6hUbVEuQqGUJzSVFAJQlEGDfFh4g4D0GpAfp
+      7NdMyCgPjNPLKH8Tq8rpaaoHFdev5+MMVv8RHlMLmpkVUPrSkOnCUdDmRGX7mpY2
+      h047FfCEF/Edfchrqht4tEO4pzR5zCZ2rrmqSWugMuq12fH0LAo=
+      -----END RSA PRIVATE KEY-----
+    termination: edge
+  to:
+    kind: Service
+    name: tibcocleproxy-v1-8496
+    weight: 100
+  wildcardPolicy: None
+---              
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  labels:
+    app: tibcocleproxy-esb-v1-8496
+  name: tibcocleproxy-esb-v1-8496
+  namespace: tib-uat
+spec:
+  host: esb-uat.metcash.com
+  path: /api/cle/rest/v1
+  port:
+    targetPort: tibcocleproxy-v1-8496
+  tls:
+    caCertificate: |-
+      -----BEGIN CERTIFICATE-----
+      MIID1zCCAr+gAwIBAgIKUGbVQgAAAAAABzANBgkqhkiG9w0BAQsFADBSMQswCQYD
+      VQQGEwJBVTEgMB4GA1UEChMXTWV0Y2FzaCBUcmFkaW5nIExpbWl0ZWQxCzAJBgNV
+      BAsTAklUMRQwEgYDVQQDEwtDRkNBUk9PVC1DQTAeFw0xNzAyMDYwNjUxMDVaFw0y
+      NzAzMjAyMzQ2MDBaME0xEzARBgoJkiaJk/IsZAEZFgNjb20xFzAVBgoJkiaJk/Is
+      ZAEZFgdtZXRjYXNoMR0wGwYDVQQDExRtZXRjYXNoLUNGQ0FTVUIwMS1DQTCCASIw
+      DQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAOcY7F7GMlOW75SxEp3qJ8n3xLYI
+      hdU3c7ETV6sFbvGRwtaOl2LqMEbH3HzhI7BDxKVUsAe3JvPy+kjgXC9Oh0Z3deCI
+      72BCGc09El4bbMIFvjFMwTBr+4kVxTOADiKAchLjJ6tHkbaf5mUiMRx6cHFe6qSn
+      qNMWqhctWR6qGcesLTNa2UkY8MpUfrF714VtqdfOEuMkpJlDRsY9cmWqrr6EAHJN
+      MdKIuqNhxzhO/XM/ISWqRQkAC8tFzQxl57tyo4pc4RN2hzTcbaDdxLDrgr+0EV4Z
+      GZcmx7r74Py58PLKvQwWfn0R+G7e4k9/RwxpIiZJWNLoUAdyBH8pFpPIVIkCAwEA
+      AaOBszCBsDAQBgkrBgEEAYI3FQEEAwIBAjAjBgkrBgEEAYI3FQIEFgQUpt5Kcjeh
+      CDWqiA+EbSxYAW19MewwHQYDVR0OBBYEFCWv9+zrzsZbQCphfKxbvw7RE4qCMBkG
+      CSsGAQQBgjcUAgQMHgoAUwB1AGIAQwBBMAsGA1UdDwQEAwIBhjAPBgNVHRMBAf8E
+      BTADAQH/MB8GA1UdIwQYMBaAFNXAeTdIjrP9vi+hjU5as73zIDssMA0GCSqGSIb3
+      DQEBCwUAA4IBAQAHsVMpuRrkpc+VNEMV3qO5ipbEwTDqyV/YZbVH8K38Am3iY6ZZ
+      rUIUxIKv3d0cTy2afhJ5kXbHqNQgjbZPxYj0uJ0n1CdgWhGJyhPWmKOId45OJ/cK
+      512tMy/q+cw4EZGeoZ47AUa9snDf/Mmjq8q/JYOS6C+CRk82bNuS41asm2i1WHWu
+      a9NBtnwCBOZqbzVV5jzC46ZDiTMt+A3kALpSBxlHdZFtT0nzQONbyulkZEcAoKrU
+      HKhPxBvesKjivAlgM+6Th02sdWPuwWU9Z16zFrCzio7kErgAhfU6WiLpUC0p9BJg
+      7A4CjgPeyc3oQ8F/msUzsvgNxLgkzLUYnQBy
+      -----END CERTIFICATE-----
+      -----BEGIN CERTIFICATE-----
+      MIIDfzCCAmegAwIBAgIQBWM9+y6w8ZxIwU09IqKJwDANBgkqhkiG9w0BAQUFADBS
+      MQswCQYDVQQGEwJBVTEgMB4GA1UEChMXTWV0Y2FzaCBUcmFkaW5nIExpbWl0ZWQx
+      CzAJBgNVBAsTAklUMRQwEgYDVQQDEwtDRkNBUk9PVC1DQTAeFw0xMjAzMjAyMzM2
+      MDFaFw0yNzAzMjAyMzQ2MDBaMFIxCzAJBgNVBAYTAkFVMSAwHgYDVQQKExdNZXRj
+      YXNoIFRyYWRpbmcgTGltaXRlZDELMAkGA1UECxMCSVQxFDASBgNVBAMTC0NGQ0FS
+      T09ULUNBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAniHi1krCALUv
+      X57UiL5LWKE1RaVW8ImaAJBCcwDhIZtX5wGiS29sYLa4ms5bnEMftSRtF2rF3l9K
+      AfDkBhjzNx0mF8nALQHwOA96TyuiVErFqufDz6RBzA1L2BmtwNuqQ59mvayQvvKK
+      7zPXTkmspexDdixqA+maEyg+NBM3jpW9uQGihNSEs8iJln23OLPBrsMwmInohwkp
+      IGNW5RjDPKwlbwQPSmbwbOR/M7cmiMHhf7CSVlzJAN8GoLlAS//OkgAiyrJJGxdY
+      zLz00hijIgnclLQED4h6XKIraTtlPemK4KP8Zx/PbpoIGDCkyRHuOfhDWoEO9+zw
+      wVW7MoHczwIDAQABo1EwTzALBgNVHQ8EBAMCAYYwDwYDVR0TAQH/BAUwAwEB/zAd
+      BgNVHQ4EFgQU1cB5N0iOs/2+L6GNTlqzvfMgOywwEAYJKwYBBAGCNxUBBAMCAQAw
+      DQYJKoZIhvcNAQEFBQADggEBACYouWYrjAqyocfO6EyaKYFuLXer6bKq8ePLO2QJ
+      3LBBV0LZNmmXOLIlrZqH8Eo33ZOsrfwE2yaCA4SZpAwkHmyzR2z1OWzOXfHsnYB6
+      vmuYOrKV4sUtf0IWKN30uN0Cx25JnNZTg6qQAuHYBiJOLZ44z0yZPazSU3T+aoP8
+      +08ed2rKp2SnO23uXjBhuVDsbz8wMbrWlS9Eq7WAEXEDgeGVkFVLexgGnhZlEv+z
+      bJMdqloBinsl+vqFeIFUXNwXG0KW37I8bKNmc0TPKkzhHQJQbfqVNRfxy1i0qYvX
+      DtNIN1nwsSu34HZVDmfKOzZaqwrpZib7l3ZAavPqUc8vdz4=
+      -----END CERTIFICATE-----
+    certificate: |-
+      -----BEGIN CERTIFICATE-----
+      MIIHFTCCBf2gAwIBAgIKFvLjMQACAA4/MDANBgkqhkiG9w0BAQsFADBNMRMwEQYK
+      CZImiZPyLGQBGRYDY29tMRcwFQYKCZImiZPyLGQBGRYHbWV0Y2FzaDEdMBsGA1UE
+      AxMUbWV0Y2FzaC1DRkNBU1VCMDEtQ0EwHhcNMTkwNjIwMDc0ODI5WhcNMjQwNjE4
+      MDc0ODI5WjCBvTELMAkGA1UEBhMCQVUxDDAKBgNVBAgTA05TVzEXMBUGA1UEBxMO
+      TWFjUXVhcmllIFBhcmsxIDAeBgNVBAoTF01FVENBU0ggVFJBRElORyBMSU1JVEVE
+      MQ8wDQYDVQQLEwZJVCBFQUkxJTAjBgNVBAMMHCouYXBwcy5vcGVuc2hpZnQubWV0
+      Y2FzaC5jb20xLTArBgkqhkiG9w0BCQEWHkludGVncmF0aW9uU3VwcG9ydEBtZXRj
+      YXNoLmNvbTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBANHnkyYj2Bqm
+      gOEW4tRK9TQumEqHh7aDOd6pQ60rC92u8ZP60A26WWUcCtDT52oDlf1/Txg5vkvh
+      xOTBnHXAQGhy3tIu76CzmkywKTCAxukPVsUFKlvUfknviphsVdQDH/36QqAykr/S
+      QuFQNjniVmVQ3PlGES5wGglWyjXw/r2c+tv/rlIcxLDCJoOvaBdSUEfrmvr3qbV2
+      2mw833bpFNXiRVlCTqSCMhEuVpk9IKJJ6jHMLakyjOyQl56c8fa83gmN/9cULpmQ
+      Dq2zWhAT9B3LFDyTARHUSEbY1nlzNyn0ZvtL3rg/k6/8RkcRPXb5uZPBlvczb68p
+      STWAVsb3LTkCAwEAAaOCA4QwggOAMB0GA1UdDgQWBBRnxitZij/iHMjUTdLor4VR
+      moYh2TAfBgNVHSMEGDAWgBQlr/fs687GW0AqYXysW78O0ROKgjCCARsGA1UdHwSC
+      ARIwggEOMIIBCqCCAQagggEChoG9bGRhcDovLy9DTj1tZXRjYXNoLUNGQ0FTVUIw
+      MS1DQSxDTj1DRkNBU3ViMDEsQ049Q0RQLENOPVB1YmxpYyUyMEtleSUyMFNlcnZp
+      Y2VzLENOPVNlcnZpY2VzLENOPUNvbmZpZ3VyYXRpb24sREM9bWV0Y2FzaCxEQz1j
+      b20/Y2VydGlmaWNhdGVSZXZvY2F0aW9uTGlzdD9iYXNlP29iamVjdENsYXNzPWNS
+      TERpc3RyaWJ1dGlvblBvaW50hkBodHRwOi8vY2ZjYXN1YjAxLm1ldGNhc2guY29t
+      L0NlcnRFbnJvbGwvbWV0Y2FzaC1DRkNBU1VCMDEtQ0EuY3JsMIIBXQYIKwYBBQUH
+      AQEEggFPMIIBSzCBswYIKwYBBQUHMAKGgaZsZGFwOi8vL0NOPW1ldGNhc2gtQ0ZD
+      QVNVQjAxLUNBLENOPUFJQSxDTj1QdWJsaWMlMjBLZXklMjBTZXJ2aWNlcyxDTj1T
+      ZXJ2aWNlcyxDTj1Db25maWd1cmF0aW9uLERDPW1ldGNhc2gsREM9Y29tP2NBQ2Vy
+      dGlmaWNhdGU/YmFzZT9vYmplY3RDbGFzcz1jZXJ0aWZpY2F0aW9uQXV0aG9yaXR5
+      MGUGCCsGAQUFBzAChllodHRwOi8vY2ZjYXN1YjAxLm1ldGNhc2guY29tL0NlcnRF
+      bnJvbGwvQ0ZDQVN1YjAxLm1ldGNhc2guY29tX21ldGNhc2gtQ0ZDQVNVQjAxLUNB
+      KDIpLmNydDAsBggrBgEFBQcwAYYgaHR0cDovL2NmY2FvcjAxLm1ldGNhc2guY29t
+      L29jc3AwDgYDVR0PAQH/BAQDAgTwMD0GCSsGAQQBgjcVBwQwMC4GJisGAQQBgjcV
+      CIPcuVSFj6ZegaWTDYPP7lqBqOd9cYWemlmFvLwhAgFlAgEAMB0GA1UdJQQWMBQG
+      CCsGAQUFBwMCBggrBgEFBQcDATAnBgkrBgEEAYI3FQoEGjAYMAoGCCsGAQUFBwMC
+      MAoGCCsGAQUFBwMBMCcGA1UdEQQgMB6CHCouYXBwcy5vcGVuc2hpZnQubWV0Y2Fz
+      aC5jb20wDQYJKoZIhvcNAQELBQADggEBAE7J+QDySHwdAQ7S29I4h40BP3o6Pg6x
+      ziqIQVubuTz5mVLfiL5E2TLuyF3bWkmUBbWVUn9A0fJ1U+yDYPoCkNCCuLynAzBc
+      p4dRNbZRbCM+LnxVsm74eGiPGGVajF38b3LgQTVrmtKhZmdK5HgJLaxDDBCz0XB7
+      +Pdlrh8U3z8x0hQkjNZGxsroekAbTEYcVZr5YkJibUUYr89r9VuXSzWNz5hyLEZb
+      eL+ECoM9Q4mL9PhAgRD9uLQYUmNJr+HvFbAy5rGiZSSI79naZOA8MzDlE/SzbHJ7
+      OnB7ZTL9+uNYg82LLPutWXad7YVBW6gTeSyt0H6rZqsCHU9IHnsxPcE=
+      -----END CERTIFICATE-----
+    key: |-
+      -----BEGIN RSA PRIVATE KEY-----
+      MIIEogIBAAKCAQEA0eeTJiPYGqaA4Rbi1Er1NC6YSoeHtoM53qlDrSsL3a7xk/rQ
+      DbpZZRwK0NPnagOV/X9PGDm+S+HE5MGcdcBAaHLe0i7voLOaTLApMIDG6Q9WxQUq
+      W9R+Se+KmGxV1AMf/fpCoDKSv9JC4VA2OeJWZVDc+UYRLnAaCVbKNfD+vZz62/+u
+      UhzEsMImg69oF1JQR+ua+veptXbabDzfdukU1eJFWUJOpIIyES5WmT0goknqMcwt
+      qTKM7JCXnpzx9rzeCY3/1xQumZAOrbNaEBP0HcsUPJMBEdRIRtjWeXM3KfRm+0ve
+      uD+Tr/xGRxE9dvm5k8GW9zNvrylJNYBWxvctOQIDAQABAoIBAE2vVh90fqOGYgZs
+      UPDe+Rch840J0elzcbR9kqWBW/fkqlXpKp0aDcHE+h/FfU0YHKfgOSavIEW3Pgan
+      vT87Mts1QFArvNYOAppFTEk+L9/LpIJwYffwkfjNJc85sR4xNeLqf0QI05UYvVXk
+      ON19bho7Lj03eF5mcMxqCZajJbSIu+zsNm9BQ9tz8DZ68Kn2dTJD20nd7RJdEGhz
+      hykz5lpt0Jk+Xe1uHiVAsEYw/jVuZH+tpBys6oBIJ4geO3AIhW68Z9R1Xnk5LKxx
+      YuAAtILWrf+7bAPJxIAQ/eEYrxKLy4sK9LZMmK6q6HdJ8YCYlKoKtpmHa8ZRNIvU
+      escjz40CgYEA8u3vUeASapIaMPBXnV1uTqTS52q79H0EF08I0B8BTMNUdnSHxbNZ
+      QJbmsCXHCwUuT47FW6CuvpHFU7JGsdeSih0+NtJ7B2PM8x8aDyBSc257LbnUr8gO
+      2M0CHU+N0iNtgJTn+E2MqXTTDWRvf6amA+cru3a+/Wp0Bcq40sBCdt8CgYEA3TLD
+      CO7h7VDt8HZ20hgewwJspXHCkwKeaFREWYNLXj/UwWIQYjWFZ8eHu1GOrBh732Nk
+      VfNv62NYyEjcQWKu3duCtHAlkj9sWbzehDjvUH9nMiv4YXHm3oAv+RIECw5pnu0q
+      j1baZk6rjE5g7abYyfbE5xlApDx8ffO+wnXRVucCgYAh7YssEzBfQ/J2fUqvRro+
+      L5TpDyYa+k7U9ovTjVEAKJOmS5YezXKcq7aiSVRoPJwALn9v0Zw2L2Ow0cg/1Ey6
+      D2V+AJ2AJbcdCW35SNlbF8YKV9bVigpQyykNcOvsulfzylgvfJ01mYRUbX+JA3xS
+      NToNX4NDH1f+6xYvEPz3XwKBgCovqzjB7n7HR4nr3f91sDA6/yOSjaxh/HojUCHO
+      Q4qHG/mBzWQdlwLS8BUOmepChSV2nEU0N20qNl2EX9Vsj7MqUUQ+ezvoMq7usXWA
+      Mkwk8DaGYkmbYo+e3QdgozrElepEizBpPR/z8w3ASQYqIwBpuuXkUArCqm+PFBuc
+      Qr+TAoGAaghDtoTzbGrvIvKX+q2H6hUbVEuQqGUJzSVFAJQlEGDfFh4g4D0GpAfp
+      7NdMyCgPjNPLKH8Tq8rpaaoHFdev5+MMVv8RHlMLmpkVUPrSkOnCUdDmRGX7mpY2
+      h047FfCEF/Edfchrqht4tEO4pzR5zCZ2rrmqSWugMuq12fH0LAo=
+      -----END RSA PRIVATE KEY-----
+    termination: edge
+  to:
+    kind: Service
+    name: tibcocleproxy-v1-8496
+    weight: 100
+  wildcardPolicy: None

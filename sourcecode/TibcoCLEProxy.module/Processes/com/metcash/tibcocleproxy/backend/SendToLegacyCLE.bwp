@@ -1,0 +1,874 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpws:process exitOnStandardFault="no"
+    name="com.metcash.tibcocleproxy.backend.SendToLegacyCLE"
+    suppressJoinFailure="yes"
+    targetNamespace="http://xmlns.example.com/20210612093634"
+    xmlns:bpws="http://docs.oasis-open.org/wsbpel/2.0/process/executable"
+    xmlns:info="http://www.tibco.com/bw/process/info"
+    xmlns:ns="http://www.tibco.com/pe/EngineTypes"
+    xmlns:ns0="http://xmlns.example.com/20210612093634PLT"
+    xmlns:ns1="http://metcash.com.au/ESB/Services/LogService/Audit/Concrete/EventServices/v1"
+    xmlns:ns2="http://tns.tibco.com/bw/palette/internal/activityerror+07e6fd1b-10fd-47eb-89ca-ec99f08d8917"
+    xmlns:ns3="http://metcash.com.au/ESB/Services/LogService/LogEvent/v3"
+    xmlns:ns4="http://www.tibco.com/pe/WriteToLogActivitySchema"
+    xmlns:sca="http://docs.oasis-open.org/ns/opencsa/sca/200912"
+    xmlns:sca-bpel="http://docs.oasis-open.org/ns/opencsa/sca-bpel/200801"
+    xmlns:tibex="http://www.tibco.com/bpel/2007/extensions"
+    xmlns:tibprop="http://ns.tibco.com/bw/property" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <tibex:Types>
+        <xs:schema attributeFormDefault="unqualified"
+            elementFormDefault="qualified"
+            targetNamespace="http://www.tibco.com/pe/EngineTypes"
+            xmlns:tns="http://www.tibco.com/pe/EngineTypes" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+            <xs:complexType block="extension restriction"
+                final="extension restriction" name="ErrorReport">
+                <xs:sequence>
+                    <xs:element
+                        block="extension restriction substitution"
+                        form="unqualified" name="StackTrace" type="xs:string"/>
+                    <xs:element
+                        block="extension restriction substitution"
+                        form="unqualified" name="Msg" type="xs:string"/>
+                    <xs:element
+                        block="extension restriction substitution"
+                        form="unqualified" name="FullClass" type="xs:string"/>
+                    <xs:element
+                        block="extension restriction substitution"
+                        form="unqualified" name="Class" type="xs:string"/>
+                    <xs:element
+                        block="extension restriction substitution"
+                        form="unqualified" name="ProcessStack" type="xs:string"/>
+                    <xs:element
+                        block="extension restriction substitution"
+                        form="unqualified" minOccurs="0" name="MsgCode" type="xs:string"/>
+                    <xs:element
+                        block="extension restriction substitution"
+                        form="unqualified" minOccurs="0" name="Data" type="tns:anydata"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType block="extension restriction"
+                final="extension restriction" name="OptionalErrorReport">
+                <xs:sequence>
+                    <xs:element
+                        block="extension restriction substitution"
+                        form="unqualified" minOccurs="0"
+                        name="StackTrace" type="xs:string"/>
+                    <xs:element
+                        block="extension restriction substitution"
+                        form="unqualified" minOccurs="0" name="Msg" type="xs:string"/>
+                    <xs:element
+                        block="extension restriction substitution"
+                        form="unqualified" minOccurs="0"
+                        name="FullClass" type="xs:string"/>
+                    <xs:element
+                        block="extension restriction substitution"
+                        form="unqualified" minOccurs="0" name="Class" type="xs:string"/>
+                    <xs:element
+                        block="extension restriction substitution"
+                        form="unqualified" minOccurs="0"
+                        name="ProcessStack" type="xs:string"/>
+                    <xs:element
+                        block="extension restriction substitution"
+                        form="unqualified" minOccurs="0" name="MsgCode" type="xs:string"/>
+                    <xs:element
+                        block="extension restriction substitution"
+                        form="unqualified" minOccurs="0" name="Data" type="tns:anydata"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType block="extension restriction"
+                final="extension restriction" name="FaultDetail">
+                <xs:sequence>
+                    <xs:element
+                        block="extension restriction substitution"
+                        form="unqualified" name="ActivityName" type="xs:string"/>
+                    <xs:element
+                        block="extension restriction substitution"
+                        form="unqualified" minOccurs="0" name="Data" type="tns:anydata"/>
+                    <xs:element
+                        block="extension restriction substitution"
+                        form="unqualified" name="Msg" type="xs:string"/>
+                    <xs:element
+                        block="extension restriction substitution"
+                        form="unqualified" name="MsgCode" type="xs:string"/>
+                    <xs:element
+                        block="extension restriction substitution"
+                        form="unqualified" name="ProcessStack" type="xs:string"/>
+                    <xs:element
+                        block="extension restriction substitution"
+                        form="unqualified" name="StackTrace" type="xs:string"/>
+                    <xs:element
+                        block="extension restriction substitution"
+                        form="unqualified" name="FullClass" type="xs:string"/>
+                    <xs:element
+                        block="extension restriction substitution"
+                        form="unqualified" name="Class" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType block="extension restriction"
+                final="extension restriction" name="ProcessContext">
+                <xs:sequence>
+                    <xs:element
+                        block="extension restriction substitution"
+                        form="unqualified" name="JobId" type="xs:string"/>
+                    <xs:element
+                        block="extension restriction substitution"
+                        form="unqualified" name="ApplicationName" type="xs:string"/>
+                    <xs:element
+                        block="extension restriction substitution"
+                        form="unqualified" name="EngineName" type="xs:string"/>
+                    <xs:element
+                        block="extension restriction substitution"
+                        form="unqualified" name="ProcessInstanceId" type="xs:string"/>
+                    <xs:element
+                        block="extension restriction substitution"
+                        form="unqualified" minOccurs="0"
+                        name="CustomJobId" type="xs:string"/>
+                    <!--xs:element name="RestartedFromCheckpoint" form="unqualified" block="extension restriction substitution" type="xs:boolean"/-->
+                    <xs:element
+                        block="extension restriction substitution"
+                        form="unqualified" maxOccurs="unbounded"
+                        minOccurs="0" name="TrackingInfo" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType block="extension restriction"
+                final="extension restriction" name="anydata">
+                <xs:sequence>
+                    <xs:any namespace="##any" processContents="lax"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element block="extension restriction substitution"
+                final="extension restriction" name="OptionalErrorReport" type="tns:OptionalErrorReport"/>
+            <xs:element block="extension restriction substitution"
+                final="extension restriction" name="ErrorReport" type="tns:ErrorReport"/>
+            <xs:element block="extension restriction substitution"
+                final="extension restriction" name="FaultDetail" type="tns:FaultDetail"/>
+            <xs:element block="extension restriction substitution"
+                final="extension restriction" name="ProcessContext" type="tns:ProcessContext"/>
+            <xs:element block="extension restriction substitution"
+                final="extension restriction" name="CorrelationValue" type="xs:string"/>
+        </xs:schema>
+        <schema attributeFormDefault="unqualified"
+            elementFormDefault="unqualified"
+            targetNamespace="http://schemas.tibco.com/bw/pe/plugin/5.0/exceptions"
+            version="" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://schemas.tibco.com/bw/pe/plugin/5.0/exceptions">
+            <complexType name="ActivityExceptionType">
+                <sequence>
+                    <element name="msg" type="string"/>
+                    <element minOccurs="0" name="msgCode" type="string"/>
+                </sequence>
+            </complexType>
+            <element name="ActivityException" type="tns:ActivityExceptionType"/>
+            <complexType name="ActivityTimedOutExceptionType">
+                <complexContent>
+                    <extension base="tns:ActivityExceptionType"/>
+                </complexContent>
+            </complexType>
+            <element name="ActivityTimedOutException" type="tns:ActivityTimedOutExceptionType"/>
+            <complexType name="DuplicateKeyExceptionType">
+                <complexContent>
+                    <extension base="tns:ActivityExceptionType">
+                        <sequence>
+                            <element name="duplicateKey" type="string"/>
+                            <element minOccurs="0" name="previousJobID" type="string"/>
+                        </sequence>
+                    </extension>
+                </complexContent>
+            </complexType>
+            <element name="DuplicateKeyException" type="tns:DuplicateKeyExceptionType"/>
+        </schema>
+        <schema elementFormDefault="unqualified"
+            targetNamespace="http://tns.tibco.com/bw/palette/internal/activityerror+07e6fd1b-10fd-47eb-89ca-ec99f08d8917"
+            xmlns="http://www.w3.org/2001/XMLSchema"
+            xmlns:Q1="http://schemas.tibco.com/bw/pe/plugin/5.0/exceptions"
+            xmlns:Q2="http://metcash.com.au/ESB/Services/LogService/LogEvent/v1" xmlns:tns="http://tns.tibco.com/bw/palette/internal/activityerror+07e6fd1b-10fd-47eb-89ca-ec99f08d8917">
+            <import
+                namespace="http://metcash.com.au/ESB/Services/LogService/LogEvent/v1" schemaLocation="../../../../../Service%20Descriptors/MetcashEventLogService.wsdl"/>
+            <import namespace="http://schemas.tibco.com/bw/pe/plugin/5.0/exceptions"/>
+            <element name="ActivityErrorData" type="tns:ActivityErrorDataType"/>
+            <complexType name="ActivityErrorDataType">
+                <choice>
+                    <element maxOccurs="1" minOccurs="0" ref="Q1:ActivityTimedOutException"/>
+                    <element maxOccurs="1" minOccurs="1" ref="Q2:LogEventException"/>
+                </choice>
+            </complexType>
+        </schema>
+        <schema attributeFormDefault="unqualified"
+            elementFormDefault="unqualified"
+            targetNamespace="http://schemas.tibco.com/bw/plugins/http/5.0/httpExceptions"
+            xmlns="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://schemas.tibco.com/bw/plugins/http/5.0/httpExceptions">
+            <complexType name="StatusLineType">
+                <sequence>
+                    <element name="httpVersion" type="string"/>
+                    <element name="statusCode" type="integer"/>
+                    <element name="reasonPhrase" type="string"/>
+                </sequence>
+            </complexType>
+            <complexType name="HeadersType">
+                <sequence>
+                    <any maxOccurs="unbounded" minOccurs="0" processContents="lax"/>
+                </sequence>
+            </complexType>
+            <complexType name="HttpMessageType">
+                <sequence>
+                    <element name="headers" type="tns:HeadersType"/>
+                    <element minOccurs="0" name="binaryContent" type="base64Binary"/>
+                    <element minOccurs="0" name="asciiContent" type="string"/>
+                </sequence>
+            </complexType>
+            <complexType name="BaseExceptionType">
+                <sequence>
+                    <element form="unqualified" name="msg" type="string"/>
+                    <element form="unqualified" name="msgCode" type="string"/>
+                </sequence>
+            </complexType>
+            <complexType name="HttpExceptionType">
+                <complexContent>
+                    <extension base="tns:BaseExceptionType"/>
+                </complexContent>
+            </complexType>
+            <complexType name="HttpClientExceptionType">
+                <complexContent>
+                    <extension base="tns:HttpResponseExceptionType"/>
+                </complexContent>
+            </complexType>
+            <complexType name="HttpCommunicationExceptionType">
+                <complexContent>
+                    <extension base="tns:BaseExceptionType"/>
+                </complexContent>
+            </complexType>
+            <complexType name="HttpResponseExceptionType">
+                <complexContent>
+                    <extension base="tns:BaseExceptionType">
+                        <sequence>
+                            <element name="statusLine" type="tns:StatusLineType"/>
+                            <element minOccurs="0" name="httpMessage" type="tns:HttpMessageType"/>
+                        </sequence>
+                    </extension>
+                </complexContent>
+            </complexType>
+            <complexType name="HttpServerExceptionType">
+                <complexContent>
+                    <extension base="tns:HttpResponseExceptionType"/>
+                </complexContent>
+            </complexType>
+            <element name="HttpClientException" type="tns:HttpClientExceptionType"/>
+            <element name="HttpCommunicationException" type="tns:HttpCommunicationExceptionType"/>
+            <element name="HttpException" type="tns:HttpExceptionType"/>
+            <element name="HttpResponseException" type="tns:HttpResponseExceptionType"/>
+            <element name="HttpServerException" type="tns:HttpServerExceptionType"/>
+            <element name="ActivityTimedOutException" type="tns:BaseExceptionType"/>
+        </schema>
+        <xs:schema attributeFormDefault="unqualified"
+            elementFormDefault="qualified"
+            targetNamespace="http://www.tibco.com/pe/WriteToLogActivitySchema"
+            xmlns:tns="http://www.tibco.com/pe/WriteToLogActivitySchema" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+            <xs:complexType name="LogParametersType">
+                <xs:sequence>
+                    <xs:element form="unqualified" minOccurs="0"
+                        name="msgCode" type="xs:string"/>
+                    <xs:element form="unqualified" minOccurs="0"
+                        name="loggerName" type="xs:string"/>
+                    <xs:element form="unqualified" minOccurs="0"
+                        name="logLevel" type="xs:string"/>
+                    <xs:element form="unqualified" name="message" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="ActivityInput" type="tns:LogParametersType"/>
+        </xs:schema>
+        <wsdl:definitions
+            targetNamespace="http://xmlns.example.com/20210612093634PLT"
+            xmlns:plnk="http://docs.oasis-open.org/wsbpel/2.0/plnktype"
+            xmlns:ptyp="http://metcash.com.au/ESB/Services/LogService/Audit/Concrete/EventServices/v1"
+            xmlns:tns="http://xmlns.example.com/20210612093634PLT"
+            xmlns:vprop="http://docs.oasis-open.org/wsbpel/2.0/varprop"
+            xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+            <plnk:partnerLinkType name="partnerLinkType">
+                <plnk:role name="use" portType="ptyp:operations"/>
+            </plnk:partnerLinkType>
+            <wsdl:import namespace="http://metcash.com.au/ESB/Services/LogService/Audit/Concrete/EventServices/v1"/>
+        </wsdl:definitions>
+    </tibex:Types>
+    <tibex:ProcessInfo callable="true" createdBy="dvira"
+        createdOn="Sat Jun 12 09:36:34 IST 2021" description=""
+        extraErrorVars="true" modifiers="public"
+        productVersion="2.6.1 V57 2021-02-13" scalable="true"
+        singleton="true" stateless="true" type="IT"/>
+    <tibex:ProcessInterface context=""
+        input="{http://metcash.com.au/ESB/Services/LogService/LogEvent/v3}LogEventPub" output=""/>
+    <tibex:ProcessTemplateConfigurations/>
+    <notation:Diagram measurementUnit="Pixel" type="BWProcess"
+        xmlns:bwnotation="http://tns.tibco.com/bw/runtime/BWNotation"
+        xmlns:notation="http://www.eclipse.org/gmf/runtime/1.0.2/notation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <children type="2001">
+            <children type="5001"/>
+            <children type="3002">
+                <styles xsi:type="notation:SortingStyle"/>
+                <styles xsi:type="notation:FilteringStyle"/>
+            </children>
+            <children type="3003">
+                <styles xsi:type="notation:SortingStyle"/>
+                <styles xsi:type="notation:FilteringStyle"/>
+            </children>
+            <children type="3004">
+                <children type="4018">
+                    <children type="3018">
+                        <children type="4020">
+                            <children type="3020">
+                                <children type="4005">
+                                    <children type="3007">
+                                    <children type="4002">
+                                    <children type="4017">
+                                    <styles
+                                    fontName="Segoe UI"
+                                    lineColor="0" xsi:type="notation:ShapeStyle"/>
+                                    <layoutConstraint xsi:type="notation:Bounds"/>
+                                    </children>
+                                    <children type="4017">
+                                    <styles
+                                    fontName="Segoe UI"
+                                    lineColor="0" xsi:type="notation:ShapeStyle"/>
+                                    <layoutConstraint xsi:type="notation:Bounds"/>
+                                    </children>
+                                    <children type="4017">
+                                    <styles
+                                    fontName="Segoe UI"
+                                    lineColor="0" xsi:type="notation:ShapeStyle"/>
+                                    <layoutConstraint xsi:type="notation:Bounds"/>
+                                    </children>
+                                    <children type="4017">
+                                    <styles
+                                    fontName="Segoe UI"
+                                    lineColor="0" xsi:type="notation:ShapeStyle"/>
+                                    <layoutConstraint xsi:type="notation:Bounds"/>
+                                    </children>
+                                    <styles fontName="Segoe UI"
+                                    lineColor="0" xsi:type="notation:ShapeStyle"/>
+                                    <styles
+                                    backgroundColor="16777215"
+                                    gradientEndColor="50431"
+                                    gradientStartColor="16777215" xsi:type="bwnotation:BackgroundStyle"/>
+                                    <element href="//0/@process/@activity/@activity/@activities.0"/>
+                                    <layoutConstraint x="-2"
+                                    xsi:type="notation:Bounds" y="146"/>
+                                    </children>
+                                    <children type="4002">
+                                    <children type="4017">
+                                    <styles
+                                    fontName="Segoe UI"
+                                    lineColor="0" xsi:type="notation:ShapeStyle"/>
+                                    <layoutConstraint xsi:type="notation:Bounds"/>
+                                    </children>
+                                    <children type="4017">
+                                    <styles
+                                    fontName="Segoe UI"
+                                    lineColor="0" xsi:type="notation:ShapeStyle"/>
+                                    <layoutConstraint xsi:type="notation:Bounds"/>
+                                    </children>
+                                    <children type="4017">
+                                    <styles
+                                    fontName="Segoe UI"
+                                    lineColor="0" xsi:type="notation:ShapeStyle"/>
+                                    <layoutConstraint xsi:type="notation:Bounds"/>
+                                    </children>
+                                    <children type="4017">
+                                    <styles
+                                    fontName="Segoe UI"
+                                    lineColor="0" xsi:type="notation:ShapeStyle"/>
+                                    <layoutConstraint xsi:type="notation:Bounds"/>
+                                    </children>
+                                    <styles fontName="Segoe UI"
+                                    lineColor="0" xsi:type="notation:ShapeStyle"/>
+                                    <styles
+                                    backgroundColor="16777215"
+                                    gradientEndColor="50431"
+                                    gradientStartColor="16777215" xsi:type="bwnotation:BackgroundStyle"/>
+                                    <element href="//0/@process/@activity/@activity/@activities.1"/>
+                                    <layoutConstraint x="361"
+                                    xsi:type="notation:Bounds" y="146"/>
+                                    </children>
+                                    <children type="4002">
+                                    <children type="4017">
+                                    <styles
+                                    fontName="Segoe UI"
+                                    lineColor="0" xsi:type="notation:ShapeStyle"/>
+                                    <layoutConstraint xsi:type="notation:Bounds"/>
+                                    </children>
+                                    <children type="4017">
+                                    <styles
+                                    fontName="Segoe UI"
+                                    lineColor="0" xsi:type="notation:ShapeStyle"/>
+                                    <layoutConstraint xsi:type="notation:Bounds"/>
+                                    </children>
+                                    <children type="4017">
+                                    <styles
+                                    fontName="Segoe UI"
+                                    lineColor="0" xsi:type="notation:ShapeStyle"/>
+                                    <layoutConstraint xsi:type="notation:Bounds"/>
+                                    </children>
+                                    <children type="4017">
+                                    <styles
+                                    fontName="Segoe UI"
+                                    lineColor="0" xsi:type="notation:ShapeStyle"/>
+                                    <layoutConstraint xsi:type="notation:Bounds"/>
+                                    </children>
+                                    <styles fontName="Segoe UI"
+                                    lineColor="0" xsi:type="notation:ShapeStyle"/>
+                                    <styles
+                                    backgroundColor="16777215"
+                                    gradientEndColor="50431"
+                                    gradientStartColor="16777215" xsi:type="bwnotation:BackgroundStyle"/>
+                                    <element href="//0/@process/@activity/@activity/@activities.2"/>
+                                    <layoutConstraint x="178"
+                                    xsi:type="notation:Bounds" y="146"/>
+                                    </children>
+                                    <children type="4002 bw.generalactivities.log">
+                                    <children type="4017">
+                                    <styles
+                                    fontName="Segoe UI"
+                                    lineColor="0" xsi:type="notation:ShapeStyle"/>
+                                    <layoutConstraint xsi:type="notation:Bounds"/>
+                                    </children>
+                                    <children type="4017">
+                                    <styles
+                                    fontName="Segoe UI"
+                                    lineColor="0" xsi:type="notation:ShapeStyle"/>
+                                    <layoutConstraint xsi:type="notation:Bounds"/>
+                                    </children>
+                                    <children type="4017">
+                                    <styles
+                                    fontName="Segoe UI"
+                                    lineColor="0" xsi:type="notation:ShapeStyle"/>
+                                    <layoutConstraint xsi:type="notation:Bounds"/>
+                                    </children>
+                                    <children type="4017">
+                                    <styles
+                                    fontName="Segoe UI"
+                                    lineColor="0" xsi:type="notation:ShapeStyle"/>
+                                    <layoutConstraint xsi:type="notation:Bounds"/>
+                                    </children>
+                                    <styles fontName="Segoe UI"
+                                    lineColor="0" xsi:type="notation:ShapeStyle"/>
+                                    <styles
+                                    backgroundColor="16777215"
+                                    gradientEndColor="50431"
+                                    gradientStartColor="16777215" xsi:type="bwnotation:BackgroundStyle"/>
+                                    <element href="//0/@process/@activity/@activity/@activities.3"/>
+                                    <layoutConstraint
+                                    height="40" width="40"
+                                    x="270"
+                                    xsi:type="notation:Bounds" y="146"/>
+                                    </children>
+                                    <children type="4002 bw.generalactivities.log">
+                                    <children type="4017">
+                                    <styles
+                                    fontName="Segoe UI"
+                                    lineColor="0" xsi:type="notation:ShapeStyle"/>
+                                    <layoutConstraint xsi:type="notation:Bounds"/>
+                                    </children>
+                                    <children type="4017">
+                                    <styles
+                                    fontName="Segoe UI"
+                                    lineColor="0" xsi:type="notation:ShapeStyle"/>
+                                    <layoutConstraint xsi:type="notation:Bounds"/>
+                                    </children>
+                                    <children type="4017">
+                                    <styles
+                                    fontName="Segoe UI"
+                                    lineColor="0" xsi:type="notation:ShapeStyle"/>
+                                    <layoutConstraint xsi:type="notation:Bounds"/>
+                                    </children>
+                                    <children type="4017">
+                                    <styles
+                                    fontName="Segoe UI"
+                                    lineColor="0" xsi:type="notation:ShapeStyle"/>
+                                    <layoutConstraint xsi:type="notation:Bounds"/>
+                                    </children>
+                                    <styles fontName="Segoe UI"
+                                    lineColor="0" xsi:type="notation:ShapeStyle"/>
+                                    <styles
+                                    backgroundColor="16777215"
+                                    gradientEndColor="50431"
+                                    gradientStartColor="16777215" xsi:type="bwnotation:BackgroundStyle"/>
+                                    <element href="//0/@process/@activity/@activity/@activities.4"/>
+                                    <layoutConstraint
+                                    height="40" width="40"
+                                    x="87"
+                                    xsi:type="notation:Bounds" y="146"/>
+                                    </children>
+                                    <styles xsi:type="notation:DrawerStyle"/>
+                                    <styles xsi:type="notation:SortingStyle"/>
+                                    <styles xsi:type="notation:FilteringStyle"/>
+                                    <element href="//0/@process/@activity/@activity"/>
+                                    </children>
+                                    <styles fontName="Segoe UI"
+                                    lineColor="0" xsi:type="notation:ShapeStyle"/>
+                                    <styles backgroundColor="16777215"
+                                    gradientEndColor="50431"
+                                    gradientStartColor="16777215" xsi:type="bwnotation:BackgroundStyle"/>
+                                    <styles xsi:type="bwnotation:ResizingStyle"/>
+                                    <element href="//0/@process/@activity/@activity"/>
+                                    <layoutConstraint height="384"
+                                    width="515" xsi:type="notation:Bounds"/>
+                                </children>
+                                <styles xsi:type="notation:SortingStyle"/>
+                                <styles xsi:type="notation:FilteringStyle"/>
+                            </children>
+                            <styles fontName="Segoe UI" lineColor="0" xsi:type="notation:ShapeStyle"/>
+                            <styles xsi:type="bwnotation:BackgroundStyle"/>
+                            <styles xsi:type="bwnotation:ResizingStyle"/>
+                            <element href="//0/@process/@activity"/>
+                            <layoutConstraint height="365" width="444"
+                                x="30" xsi:type="notation:Bounds" y="20"/>
+                        </children>
+                        <styles xsi:type="notation:SortingStyle"/>
+                        <styles xsi:type="notation:FilteringStyle"/>
+                        <element href="//0/@process/@activity"/>
+                    </children>
+                    <styles fontName="Segoe UI" lineColor="0" xsi:type="notation:ShapeStyle"/>
+                    <styles xsi:type="bwnotation:BackgroundStyle"/>
+                    <styles xsi:type="bwnotation:ResizingStyle"/>
+                    <element href="//0/@process/@activity"/>
+                    <layoutConstraint height="409" width="519" xsi:type="notation:Bounds"/>
+                </children>
+                <styles xsi:type="notation:SortingStyle"/>
+                <styles xsi:type="notation:FilteringStyle"/>
+                <element href="//0/@process"/>
+            </children>
+            <styles fontName="Segoe UI" lineColor="0" xsi:type="notation:ShapeStyle"/>
+            <element href="//0/@process"/>
+            <layoutConstraint height="460" width="860" xsi:type="notation:Bounds"/>
+        </children>
+        <styles xsi:type="notation:DiagramStyle"/>
+        <element href="//0"/>
+        <edges
+            source="//@children.0/@children.3/@children.0/@children.0/@children.0/@children.0/@children.0/@children.0/@children.0"
+            target="//@children.0/@children.3/@children.0/@children.0/@children.0/@children.0/@children.0/@children.0/@children.4" type="4006">
+            <children type="6002">
+                <layoutConstraint xsi:type="notation:Location" y="40"/>
+            </children>
+            <styles lineColor="0" xsi:type="notation:ConnectorStyle"/>
+            <styles fontName="Segoe UI" xsi:type="notation:FontStyle"/>
+            <element href="//0/@process/@activity/@activity/@links/@children.0"/>
+            <bendpoints points="[0, 0, 0, 0]$[0, 0, 0, 0]" xsi:type="notation:RelativeBendpoints"/>
+        </edges>
+        <edges
+            source="//@children.0/@children.3/@children.0/@children.0/@children.0/@children.0/@children.0/@children.0/@children.2"
+            target="//@children.0/@children.3/@children.0/@children.0/@children.0/@children.0/@children.0/@children.0/@children.3" type="4006">
+            <children type="6002">
+                <layoutConstraint xsi:type="notation:Location" y="40"/>
+            </children>
+            <styles lineColor="0" xsi:type="notation:ConnectorStyle"/>
+            <styles fontName="Segoe UI" xsi:type="notation:FontStyle"/>
+            <element href="//0/@process/@activity/@activity/@links/@children.1"/>
+            <bendpoints points="[0, 0, 0, 0]$[0, 0, 0, 0]" xsi:type="notation:RelativeBendpoints"/>
+        </edges>
+        <edges
+            source="//@children.0/@children.3/@children.0/@children.0/@children.0/@children.0/@children.0/@children.0/@children.3"
+            target="//@children.0/@children.3/@children.0/@children.0/@children.0/@children.0/@children.0/@children.0/@children.1" type="4006">
+            <children type="6002">
+                <layoutConstraint xsi:type="notation:Location" y="40"/>
+            </children>
+            <styles lineColor="0" xsi:type="notation:ConnectorStyle"/>
+            <styles fontName="Segoe UI" xsi:type="notation:FontStyle"/>
+            <element href="//0/@process/@activity/@activity/@links/@children.2"/>
+            <bendpoints points="[0, 0, 0, 0]$[0, 0, 0, 0]" xsi:type="notation:RelativeBendpoints"/>
+        </edges>
+        <edges
+            source="//@children.0/@children.3/@children.0/@children.0/@children.0/@children.0/@children.0/@children.0/@children.4"
+            target="//@children.0/@children.3/@children.0/@children.0/@children.0/@children.0/@children.0/@children.0/@children.2" type="4006">
+            <children type="6002">
+                <layoutConstraint xsi:type="notation:Location" y="40"/>
+            </children>
+            <styles lineColor="0" xsi:type="notation:ConnectorStyle"/>
+            <styles fontName="Segoe UI" xsi:type="notation:FontStyle"/>
+            <element href="//0/@process/@activity/@activity/@links/@children.3"/>
+            <bendpoints points="[0, 0, 0, 0]$[0, 0, 0, 0]" xsi:type="notation:RelativeBendpoints"/>
+        </edges>
+    </notation:Diagram>
+    <tibex:NamespaceRegistry enabled="true">
+        <tibex:namespaceItem
+            namespace="http://metcash.com.au/ESB/Common/ESBHeader/v1" prefix="ns2"/>
+        <tibex:namespaceItem
+            namespace="http://metcash.com.au/ESB/Common/Types/ServiceIdentifier/v1" prefix="ns6"/>
+        <tibex:namespaceItem
+            namespace="http://metcash.com.au/ESB/Common/ESBHeader/v3" prefix="ns"/>
+        <tibex:namespaceItem
+            namespace="http://metcash.com.au/ESB/Common/Types/TransactionContext/v1" prefix="ns4"/>
+        <tibex:namespaceItem
+            namespace="http://metcash.com.au/ESB/Common/Types/TransactionContext/v3" prefix="ns3"/>
+        <tibex:namespaceItem
+            namespace="http://metcash.com.au/ESB/Common/Types/ServiceIdentifier/v3" prefix="ns5"/>
+        <tibex:namespaceItem
+            namespace="http://metcash.com.au/ESB/Services/LogService/Audit/Concrete/EventServices/v1" prefix="tns"/>
+        <tibex:namespaceItem
+            namespace="http://metcash.com.au/ESB/Services/LogService/LogEvent/v1" prefix="ns1"/>
+        <tibex:namespaceItem
+            namespace="http://metcash.com.au/ESB/Services/LogService/Common/Event/v1" prefix="ns9"/>
+        <tibex:namespaceItem
+            namespace="http://metcash.com.au/ESB/Services/LogService/Common/ResubmissionContext/v3" prefix="ns7"/>
+        <tibex:namespaceItem
+            namespace="http://metcash.com.au/ESB/Services/LogService/Common/ResubmissionContext/v1" prefix="ns10"/>
+        <tibex:namespaceItem
+            namespace="http://metcash.com.au/ESB/Services/LogService/Common/Event/v3" prefix="ns8"/>
+        <tibex:namespaceItem
+            namespace="http://metcash.com.au/ESB/Services/LogService/Common/ApplicationContext/v3" prefix="ns11"/>
+        <tibex:namespaceItem
+            namespace="http://metcash.com.au/ESB/Services/LogService/Common/ApplicationContext/v1" prefix="ns12"/>
+        <tibex:namespaceItem
+            namespace="http://metcash.com.au/ESB/Common/Types/NameValue/v1" prefix="ns14"/>
+        <tibex:namespaceItem
+            namespace="http://metcash.com.au/ESB/Common/Types/NameValue/v3" prefix="ns13"/>
+        <tibex:namespaceItem
+            namespace="http://metcash.com.au/ESB/Services/LogService/Common/EventContext/v1" prefix="ns16"/>
+        <tibex:namespaceItem
+            namespace="http://metcash.com.au/ESB/Services/LogService/Common/EventContext/v3" prefix="ns15"/>
+        <tibex:namespaceItem
+            namespace="http://metcash.com.au/ESB/Services/LogService/Common/ExceptionDetail/v1" prefix="ns18"/>
+        <tibex:namespaceItem
+            namespace="http://metcash.com.au/ESB/Services/LogService/Common/ExceptionDetail/v3" prefix="ns17"/>
+        <tibex:namespaceItem
+            namespace="http://www.tibco.com/pe/WriteToLogActivitySchema" prefix="tns1"/>
+    </tibex:NamespaceRegistry>
+    <bpws:import importType="http://schemas.xmlsoap.org/wsdl/" namespace="http://metcash.com.au/ESB/Services/LogService/Audit/Concrete/EventServices/v1"/>
+    <bpws:import importType="http://www.w3.org/2001/XMLSchema" namespace="http://metcash.com.au/ESB/Services/LogService/LogEvent/v3"/>
+    <bpws:partnerLinks>
+        <bpws:partnerLink name="operations"
+            partnerLinkType="ns0:partnerLinkType" partnerRole="use"
+            sca-bpel:ignore="true" sca-bpel:reference="operations" sca-bpel:wiredByImpl="false">
+            <tibex:ReferenceBinding>
+                <tibex:binding>
+                    <bwbinding:BWBaseBinding
+                        xmlns:axis2="http://xsd.tns.tibco.com/bw/models/binding/soap/axis2"
+                        xmlns:bwbinding="http://tns.tibco.com/bw/model/core/bwbinding"
+                        xmlns:pt="http://metcash.com.au/ESB/Services/LogService/Audit/Concrete/EventServices/v1"
+                        xmlns:sca="http://www.osoa.org/xmlns/sca/1.0"
+                        xmlns:scact="http://xsd.tns.tibco.com/amf/models/sca/componentType"
+                        xmlns:scaext="http://xsd.tns.tibco.com/amf/models/sca/extensions"
+                        xmlns:v1="http://metcash.com.au/ESB/Services/LogService/LogEvent/v1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                        <referenceBinding name="operations" xsi:type="scact:Reference">
+                            <sca:interface.wsdl
+                                interface="http://metcash.com.au/ESB/Services/LogService/Audit/Concrete/EventServices/v1#wsdl.interface(operations)" scaext:wsdlLocation="../../../../../Service%20Descriptors/MetcashEventLogService.wsdl"/>
+                            <scaext:binding
+                                locationURI="http://localhost:7562/LogService/InterfaceServices/SOAP/Event/EventServices.serviceagent/operationsEndpoint"
+                                modelVersion="1.2.0"
+                                name="SOAPReferenceBinding"
+                                portName="operationsEndpoint"
+                                portTypeQName="pt:operations"
+                                portTypeWSDLLocation="platform:/resource/TibcoCLEProxy.module/Service%20Descriptors/MetcashEventLogService.wsdl"
+                                serviceBindingQName="pt:operationsEndpointBinding"
+                                serviceQName="pt:EventServices"
+                                transportBindingType="HTTP"
+                                wsdlLocation="platform:/resource/TibcoCLEProxy.module/Service%20Descriptors/MetcashEventLogService.wsdl" xsi:type="axis2:SOAPReferenceBinding">
+                                <bindingType style="DOCUMENT"/>
+                                <operationConfiguration
+                                    action="/LogService/InterfaceServices/SOAP/Event/EventServices.serviceagent//logEvent" operationName="logEvent">
+                                    <bindingType style="DOCUMENT"/>
+                                    <messageConfiguration
+                                    messageQName="pt:LogEventRequest" wsdlLocation="platform:/resource/TibcoCLEProxy.module/Service%20Descriptors/MetcashEventLogService.wsdl">
+                                    <messagePartConfigurations
+                                    encoding="literal"
+                                    partElementName="v1:LogEventPub"
+                                    partName="input" xsi:type="axis2:BodyPartConfiguration"/>
+                                    </messageConfiguration>
+                                    <messageConfiguration
+                                    action="fault1"
+                                    messageDirection="FAULT"
+                                    messageQName="pt:LogEventFault" wsdlLocation="platform:/resource/TibcoCLEProxy.module/Service%20Descriptors/MetcashEventLogService.wsdl">
+                                    <messagePartConfigurations
+                                    partElementName="v1:LogEventException"
+                                    partName="details" xsi:type="axis2:BodyPartConfiguration"/>
+                                    </messageConfiguration>
+                                    <context>
+                                    <inputMapping/>
+                                    <faultMappings direction="FAULT" faultName="fault1"/>
+                                    </context>
+                                </operationConfiguration>
+                                <operationConfiguration
+                                    action="/LogService/InterfaceServices/SOAP/Event/EventServices.serviceagent//syncLogEvent" operationName="syncLogEvent">
+                                    <bindingType style="DOCUMENT"/>
+                                    <messageConfiguration
+                                    messageQName="pt:LogEventRequest" wsdlLocation="platform:/resource/TibcoCLEProxy.module/Service%20Descriptors/MetcashEventLogService.wsdl">
+                                    <messagePartConfigurations
+                                    encoding="literal"
+                                    partElementName="v1:LogEventPub"
+                                    partName="input" xsi:type="axis2:BodyPartConfiguration"/>
+                                    </messageConfiguration>
+                                    <messageConfiguration
+                                    messageDirection="OUTPUT"
+                                    messageQName="pt:LogEventResponse" wsdlLocation="platform:/resource/TibcoCLEProxy.module/Service%20Descriptors/MetcashEventLogService.wsdl">
+                                    <messagePartConfigurations
+                                    encoding="literal"
+                                    partElementName="v1:LogEventResponse"
+                                    partName="output" xsi:type="axis2:BodyPartConfiguration"/>
+                                    </messageConfiguration>
+                                    <messageConfiguration
+                                    action="fault1"
+                                    messageDirection="FAULT"
+                                    messageQName="pt:LogEventFault" wsdlLocation="platform:/resource/TibcoCLEProxy.module/Service%20Descriptors/MetcashEventLogService.wsdl">
+                                    <messagePartConfigurations
+                                    partElementName="v1:LogEventException"
+                                    partName="details" xsi:type="axis2:BodyPartConfiguration"/>
+                                    </messageConfiguration>
+                                    <context>
+                                    <inputMapping/>
+                                    <outputMapping direction="OUTPUT"/>
+                                    <faultMappings direction="FAULT" faultName="fault1"/>
+                                    </context>
+                                </operationConfiguration>
+                                <outboundConfiguration
+                                    httpClient="com.metcash.tibcocleproxy.backend.HttpClientLegacyCLE" xsi:type="axis2:HttpTransportConfiguration"/>
+                            </scaext:binding>
+                            <scact:bindingAdjunct bindingName="SOAPReferenceBinding"/>
+                        </referenceBinding>
+                    </bwbinding:BWBaseBinding>
+                </tibex:binding>
+            </tibex:ReferenceBinding>
+        </bpws:partnerLink>
+    </bpws:partnerLinks>
+    <bpws:variables>
+        <bpws:variable element="ns:ProcessContext"
+            name="_processContext" sca-bpel:internal="true"/>
+        <bpws:variable messageType="ns1:LogEventRequest"
+            name="logEvent-input" sca-bpel:internal="true"/>
+        <bpws:variable element="ns2:ActivityErrorData"
+            name="_error_logEvent" sca-bpel:internal="true"/>
+        <bpws:variable element="ns:ErrorReport" name="_error" sca-bpel:internal="true"/>
+        <bpws:variable element="ns3:LogEventPub" name="Start"
+            sca-bpel:internal="true" tibex:parameter="in"/>
+        <bpws:variable element="ns4:ActivityInput" name="LogEnd-input" sca-bpel:internal="true"/>
+        <bpws:variable element="ns4:ActivityInput" name="LogStart-input" sca-bpel:internal="true"/>
+    </bpws:variables>
+    <bpws:extensions>
+        <bpws:extension mustUnderstand="no" namespace="http://www.eclipse.org/gmf/runtime/1.0.2/notation"/>
+        <bpws:extension mustUnderstand="no" namespace="http://www.tibco.com/bw/process/info"/>
+        <bpws:extension mustUnderstand="no" namespace="http://docs.oasis-open.org/ns/opencsa/sca-bpel/200801"/>
+        <bpws:extension mustUnderstand="no" namespace="http://docs.oasis-open.org/ns/opencsa/sca/200912"/>
+        <bpws:extension mustUnderstand="no" namespace="http://ns.tibco.com/bw/property"/>
+        <bpws:extension mustUnderstand="no" namespace="http://www.tibco.com/bpel/2007/extensions"/>
+    </bpws:extensions>
+    <bpws:scope name="scope">
+        <bpws:flow name="flow">
+            <bpws:links>
+                <bpws:link name="StartTologEvent" tibex:linkType="SUCCESS"/>
+                <bpws:link name="logEventToEnd" tibex:linkType="SUCCESS"/>
+                <bpws:link name="LogToEnd" tibex:linkType="SUCCESS"/>
+                <bpws:link name="Log1TologEvent" tibex:linkType="SUCCESS"/>
+            </bpws:links>
+            <bpws:extensionActivity>
+                <tibex:receiveEvent createInstance="yes"
+                    eventTimeout="0" name="Start"
+                    tibex:xpdlId="e92ac0ba-a526-43f2-9222-2da11e7189e4"
+                    variable="Start" xmlns:tibex="http://www.tibco.com/bpel/2007/extensions">
+                    <bpws:sources>
+                        <bpws:source linkName="StartTologEvent"/>
+                    </bpws:sources>
+                    <tibex:eventSource>
+                        <tibex:StartEvent xmlns:tibex="http://www.tibco.com/bpel/2007/extensions"/>
+                    </tibex:eventSource>
+                </tibex:receiveEvent>
+            </bpws:extensionActivity>
+            <bpws:extensionActivity>
+                <tibex:activityExtension name="End"
+                    tibex:xpdlId="040310c5-d23b-4a31-a260-4ba2af77dfe5" xmlns:tibex="http://www.tibco.com/bpel/2007/extensions">
+                    <bpws:targets>
+                        <bpws:target linkName="LogToEnd"/>
+                    </bpws:targets>
+                    <tibex:config>
+                        <bwext:BWActivity
+                            activityTypeID="bw.internal.end"
+                            xmlns:activityconfig="http://tns.tibco.com/bw/model/activityconfig"
+                            xmlns:bwext="http://tns.tibco.com/bw/model/core/bwext"
+                            xmlns:internalactivities="http://ns.tibco.com/bw/core/internalactivity" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                            <activityConfig>
+                                <properties name="config" xsi:type="activityconfig:EMFProperty">
+                                    <type href="http://ns.tibco.com/bw/core/internalactivity#//End"/>
+                                    <value xsi:type="internalactivities:End"/>
+                                </properties>
+                            </activityConfig>
+                        </bwext:BWActivity>
+                    </tibex:config>
+                </tibex:activityExtension>
+            </bpws:extensionActivity>
+            <bpws:invoke inputVariable="logEvent-input" name="logEvent"
+                operation="logEvent" partnerLink="operations"
+                portType="ns1:operations" tibex:xpdlId="07e6fd1b-10fd-47eb-89ca-ec99f08d8917">
+                <tibex:inputBinding expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xslt1.0">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:tns="http://metcash.com.au/ESB/Services/LogService/Audit/Concrete/EventServices/v1" xmlns:ns="http://metcash.com.au/ESB/Common/ESBHeader/v3" xmlns:ns1="http://metcash.com.au/ESB/Services/LogService/LogEvent/v1" xmlns:ns2="http://metcash.com.au/ESB/Common/ESBHeader/v1" xmlns:ns3="http://metcash.com.au/ESB/Common/Types/TransactionContext/v3" xmlns:ns4="http://metcash.com.au/ESB/Common/Types/TransactionContext/v1" xmlns:ns5="http://metcash.com.au/ESB/Common/Types/ServiceIdentifier/v3" xmlns:ns6="http://metcash.com.au/ESB/Common/Types/ServiceIdentifier/v1" xmlns:ns7="http://metcash.com.au/ESB/Services/LogService/Common/ResubmissionContext/v3" xmlns:ns8="http://metcash.com.au/ESB/Services/LogService/Common/Event/v3" xmlns:ns9="http://metcash.com.au/ESB/Services/LogService/Common/Event/v1" xmlns:ns10="http://metcash.com.au/ESB/Services/LogService/Common/ResubmissionContext/v1" xmlns:ns11="http://metcash.com.au/ESB/Services/LogService/Common/ApplicationContext/v3" xmlns:ns12="http://metcash.com.au/ESB/Services/LogService/Common/ApplicationContext/v1" xmlns:ns13="http://metcash.com.au/ESB/Common/Types/NameValue/v3" xmlns:ns14="http://metcash.com.au/ESB/Common/Types/NameValue/v1" xmlns:ns15="http://metcash.com.au/ESB/Services/LogService/Common/EventContext/v3" xmlns:ns16="http://metcash.com.au/ESB/Services/LogService/Common/EventContext/v1" xmlns:ns17="http://metcash.com.au/ESB/Services/LogService/Common/ExceptionDetail/v3" xmlns:ns18="http://metcash.com.au/ESB/Services/LogService/Common/ExceptionDetail/v1" version="2.0"&gt;&lt;xsl:param name="Start"/&gt;&lt;xsl:template name="logEvent-input" match="/"&gt;&lt;tns:LogEventRequest&gt;&lt;input&gt;&lt;ns1:LogEventPub&gt;&lt;ns2:ESBHeader&gt;&lt;ns2:TransactionContext&gt;&lt;ns4:TransactionID&gt;&lt;xsl:value-of select="$Start/ns:ESBHeader/ns:TransactionContext/ns3:TransactionID"/&gt;&lt;/ns4:TransactionID&gt;&lt;xsl:if test="$Start/ns:ESBHeader/ns:TransactionContext/ns3:CreationTime"&gt;&lt;ns4:CreationTime&gt;&lt;xsl:value-of select="$Start/ns:ESBHeader/ns:TransactionContext/ns3:CreationTime"/&gt;&lt;/ns4:CreationTime&gt;&lt;/xsl:if&gt;&lt;xsl:if test="$Start/ns:ESBHeader/ns:TransactionContext/ns3:ExpiryInterval"&gt;&lt;ns4:ExpiryInterval&gt;&lt;xsl:value-of select="$Start/ns:ESBHeader/ns:TransactionContext/ns3:ExpiryInterval"/&gt;&lt;/ns4:ExpiryInterval&gt;&lt;/xsl:if&gt;&lt;/ns2:TransactionContext&gt;&lt;ns2:SourceService&gt;&lt;ns6:ServiceName&gt;&lt;xsl:value-of select="$Start/ns:ESBHeader/ns:SourceService/ns5:ServiceName"/&gt;&lt;/ns6:ServiceName&gt;&lt;/ns2:SourceService&gt;&lt;ns2:TargetService&gt;&lt;ns6:ServiceName&gt;&lt;xsl:value-of select="$Start/ns:ESBHeader/ns:TargetService/ns5:ServiceName"/&gt;&lt;/ns6:ServiceName&gt;&lt;/ns2:TargetService&gt;&lt;xsl:if test="string-length($Start/ns:ESBHeader/ns:Status/ns:State)&gt;0"&gt;&lt;ns2:Status&gt;&lt;ns2:State&gt;&lt;xsl:value-of select="$Start/ns:ESBHeader/ns:Status/ns:State"/&gt;&lt;/ns2:State&gt;&lt;ns2:GeneratingService&gt;&lt;ns6:ServiceName&gt;&lt;xsl:value-of select="$Start/ns:ESBHeader/ns:Status/ns:GeneratingService/ns5:ServiceName"/&gt;&lt;/ns6:ServiceName&gt;&lt;/ns2:GeneratingService&gt;&lt;xsl:if test="$Start/ns:ESBHeader/ns:Status/ns:StatusCode"&gt;&lt;ns2:StatusCode&gt;&lt;xsl:value-of select="$Start/ns:ESBHeader/ns:Status/ns:StatusCode"/&gt;&lt;/ns2:StatusCode&gt;&lt;/xsl:if&gt;&lt;xsl:if test="$Start/ns:ESBHeader/ns:Status/ns:Message"&gt;&lt;ns2:Message&gt;&lt;xsl:value-of select="$Start/ns:ESBHeader/ns:Status/ns:Message"/&gt;&lt;/ns2:Message&gt;&lt;/xsl:if&gt;&lt;/ns2:Status&gt;&lt;/xsl:if&gt;&lt;/ns2:ESBHeader&gt;&lt;ns9:Event&gt;&lt;ns10:ResubmissionContext&gt;&lt;xsl:if test="$Start/ns8:Event/ns7:ResubmissionContext/ns7:Transport"&gt;&lt;ns10:Transport&gt;&lt;xsl:value-of select="$Start/ns8:Event/ns7:ResubmissionContext/ns7:Transport"/&gt;&lt;/ns10:Transport&gt;&lt;/xsl:if&gt;&lt;xsl:if test="$Start/ns8:Event/ns7:ResubmissionContext/ns7:Destination"&gt;&lt;ns10:Destination&gt;&lt;xsl:value-of select="$Start/ns8:Event/ns7:ResubmissionContext/ns7:Destination"/&gt;&lt;/ns10:Destination&gt;&lt;/xsl:if&gt;&lt;xsl:if test="$Start/ns8:Event/ns7:ResubmissionContext/ns7:ReplyTo"&gt;&lt;ns10:ReplyTo&gt;&lt;xsl:value-of select="$Start/ns8:Event/ns7:ResubmissionContext/ns7:ReplyTo"/&gt;&lt;/ns10:ReplyTo&gt;&lt;/xsl:if&gt;&lt;xsl:if test="$Start/ns8:Event/ns7:ResubmissionContext/ns7:Payload"&gt;&lt;ns10:Payload&gt;&lt;xsl:value-of select="$Start/ns8:Event/ns7:ResubmissionContext/ns7:Payload"/&gt;&lt;/ns10:Payload&gt;&lt;/xsl:if&gt;&lt;/ns10:ResubmissionContext&gt;&lt;ns12:ApplicationContext&gt;&lt;xsl:for-each select="$Start/ns8:Event/ns11:ApplicationContext/ns11:GenericExtensionData"&gt;&lt;ns12:GenericExtensionData&gt;&lt;xsl:attribute name="name"&gt;&lt;xsl:value-of select="ns13:Name"/&gt;&lt;/xsl:attribute&gt;&lt;ns14:Value&gt;&lt;xsl:value-of select="ns13:Value"/&gt;&lt;/ns14:Value&gt;&lt;/ns12:GenericExtensionData&gt;&lt;/xsl:for-each&gt;&lt;/ns12:ApplicationContext&gt;&lt;ns16:EventContext&gt;&lt;ns16:EventType&gt;&lt;xsl:value-of select="$Start/ns8:Event/ns15:EventContext/ns15:EventType"/&gt;&lt;/ns16:EventType&gt;&lt;ns16:Timestamp&gt;&lt;xsl:value-of select="$Start/ns8:Event/ns15:EventContext/ns15:Timestamp"/&gt;&lt;/ns16:Timestamp&gt;&lt;ns16:AuditStep&gt;&lt;xsl:value-of select="$Start/ns8:Event/ns15:EventContext/ns15:AuditStep"/&gt;&lt;/ns16:AuditStep&gt;&lt;ns16:AuditText&gt;&lt;xsl:value-of select="$Start/ns8:Event/ns15:EventContext/ns15:AuditText"/&gt;&lt;/ns16:AuditText&gt;&lt;ns16:Host&gt;&lt;xsl:value-of select="$Start/ns8:Event/ns15:EventContext/ns15:Host"/&gt;&lt;/ns16:Host&gt;&lt;ns16:EngineName&gt;&lt;xsl:value-of select="$Start/ns8:Event/ns15:EventContext/ns15:EngineName"/&gt;&lt;/ns16:EngineName&gt;&lt;xsl:if test="$Start/ns8:Event/ns15:EventContext/ns15:ProcessName"&gt;&lt;ns16:ProcessName&gt;&lt;xsl:value-of select="$Start/ns8:Event/ns15:EventContext/ns15:ProcessName"/&gt;&lt;/ns16:ProcessName&gt;&lt;/xsl:if&gt;&lt;xsl:if test="$Start/ns8:Event/ns15:EventContext/ns15:ProjectName"&gt;&lt;ns16:ProjectName&gt;&lt;xsl:value-of select="$Start/ns8:Event/ns15:EventContext/ns15:ProjectName"/&gt;&lt;/ns16:ProjectName&gt;&lt;/xsl:if&gt;&lt;xsl:if test="count($Start/ns8:Event/ns15:EventContext/ns15:EventAnalysisData/ns15:AnalysisData)&gt;0"&gt;&lt;ns16:EventAnalysisData&gt;&lt;xsl:for-each select="$Start/ns8:Event/ns15:EventContext/ns15:EventAnalysisData/ns15:AnalysisData"&gt;&lt;ns16:AnalysisData&gt;&lt;xsl:attribute name="name"&gt;&lt;xsl:value-of select="ns13:Name"/&gt;&lt;/xsl:attribute&gt;&lt;ns14:Value&gt;&lt;xsl:value-of select="ns13:Value"/&gt;&lt;/ns14:Value&gt;&lt;/ns16:AnalysisData&gt;&lt;/xsl:for-each&gt;&lt;/ns16:EventAnalysisData&gt;&lt;/xsl:if&gt;&lt;ns18:ExceptionDetail&gt;&lt;ns18:ExceptionCode&gt;&lt;xsl:value-of select="$Start/ns8:Event/ns15:EventContext/ns17:ExceptionDetail/ns17:ExceptionCode"/&gt;&lt;/ns18:ExceptionCode&gt;&lt;ns18:ExceptionMessage&gt;&lt;xsl:value-of select="$Start/ns8:Event/ns15:EventContext/ns17:ExceptionDetail/ns17:ExceptionMessage"/&gt;&lt;/ns18:ExceptionMessage&gt;&lt;xsl:if test="$Start/ns8:Event/ns15:EventContext/ns17:ExceptionDetail/ns17:Stacktrace"&gt;&lt;ns18:Stacktrace&gt;&lt;xsl:value-of select="$Start/ns8:Event/ns15:EventContext/ns17:ExceptionDetail/ns17:Stacktrace"/&gt;&lt;/ns18:Stacktrace&gt;&lt;/xsl:if&gt;&lt;xsl:if test="$Start/ns8:Event/ns15:EventContext/ns17:ExceptionDetail/ns17:ProcessStack"&gt;&lt;ns18:ProcessStack&gt;&lt;xsl:value-of select="$Start/ns8:Event/ns15:EventContext/ns17:ExceptionDetail/ns17:ProcessStack"/&gt;&lt;/ns18:ProcessStack&gt;&lt;/xsl:if&gt;&lt;/ns18:ExceptionDetail&gt;&lt;/ns16:EventContext&gt;&lt;/ns9:Event&gt;&lt;/ns1:LogEventPub&gt;&lt;/input&gt;&lt;/tns:LogEventRequest&gt;&lt;/xsl:template&gt;&lt;/xsl:stylesheet&gt;</tibex:inputBinding>
+                <tibex:inputBindings>
+                    <tibex:partBinding
+                        expression="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?>&#xa;&lt;xsl:stylesheet xmlns:xsl=&quot;http://www.w3.org/1999/XSL/Transform&quot; xmlns:tns=&quot;http://metcash.com.au/ESB/Services/LogService/Audit/Concrete/EventServices/v1&quot; xmlns:ns=&quot;http://metcash.com.au/ESB/Common/ESBHeader/v3&quot; xmlns:ns1=&quot;http://metcash.com.au/ESB/Services/LogService/LogEvent/v1&quot; xmlns:ns2=&quot;http://metcash.com.au/ESB/Common/ESBHeader/v1&quot; xmlns:ns3=&quot;http://metcash.com.au/ESB/Common/Types/TransactionContext/v3&quot; xmlns:ns4=&quot;http://metcash.com.au/ESB/Common/Types/TransactionContext/v1&quot; xmlns:ns5=&quot;http://metcash.com.au/ESB/Common/Types/ServiceIdentifier/v3&quot; xmlns:ns6=&quot;http://metcash.com.au/ESB/Common/Types/ServiceIdentifier/v1&quot; xmlns:ns7=&quot;http://metcash.com.au/ESB/Services/LogService/Common/ResubmissionContext/v3&quot; xmlns:ns8=&quot;http://metcash.com.au/ESB/Services/LogService/Common/Event/v3&quot; xmlns:ns9=&quot;http://metcash.com.au/ESB/Services/LogService/Common/Event/v1&quot; xmlns:ns10=&quot;http://metcash.com.au/ESB/Services/LogService/Common/ResubmissionContext/v1&quot; xmlns:ns11=&quot;http://metcash.com.au/ESB/Services/LogService/Common/ApplicationContext/v3&quot; xmlns:ns12=&quot;http://metcash.com.au/ESB/Services/LogService/Common/ApplicationContext/v1&quot; xmlns:ns13=&quot;http://metcash.com.au/ESB/Common/Types/NameValue/v3&quot; xmlns:ns14=&quot;http://metcash.com.au/ESB/Common/Types/NameValue/v1&quot; xmlns:ns15=&quot;http://metcash.com.au/ESB/Services/LogService/Common/EventContext/v3&quot; xmlns:ns16=&quot;http://metcash.com.au/ESB/Services/LogService/Common/EventContext/v1&quot; xmlns:ns17=&quot;http://metcash.com.au/ESB/Services/LogService/Common/ExceptionDetail/v3&quot; xmlns:ns18=&quot;http://metcash.com.au/ESB/Services/LogService/Common/ExceptionDetail/v1&quot; version=&quot;2.0&quot;>&#xa;    &lt;xsl:param name=&quot;Start&quot;/>&#xa;    &lt;xsl:template name=&quot;logEvent-input&quot; match=&quot;/&quot;>&#xa;        &lt;ns1:LogEventPub>&#xa;            &lt;ns2:ESBHeader>&#xa;                &lt;ns2:TransactionContext>&#xa;                    &lt;ns4:TransactionID>&#xa;                        &lt;xsl:value-of select=&quot;$Start/ns:ESBHeader/ns:TransactionContext/ns3:TransactionID&quot;/>&#xa;                    &lt;/ns4:TransactionID>&#xa;                    &lt;xsl:if test=&quot;$Start/ns:ESBHeader/ns:TransactionContext/ns3:CreationTime&quot;>&#xa;                        &lt;ns4:CreationTime>&#xa;                            &lt;xsl:value-of select=&quot;$Start/ns:ESBHeader/ns:TransactionContext/ns3:CreationTime&quot;/>&#xa;                        &lt;/ns4:CreationTime>&#xa;                    &lt;/xsl:if>&#xa;                    &lt;xsl:if test=&quot;$Start/ns:ESBHeader/ns:TransactionContext/ns3:ExpiryInterval&quot;>&#xa;                        &lt;ns4:ExpiryInterval>&#xa;                            &lt;xsl:value-of select=&quot;$Start/ns:ESBHeader/ns:TransactionContext/ns3:ExpiryInterval&quot;/>&#xa;                        &lt;/ns4:ExpiryInterval>&#xa;                    &lt;/xsl:if>&#xa;                &lt;/ns2:TransactionContext>&#xa;                &lt;ns2:SourceService>&#xa;                    &lt;ns6:ServiceName>&#xa;                        &lt;xsl:value-of select=&quot;$Start/ns:ESBHeader/ns:SourceService/ns5:ServiceName&quot;/>&#xa;                    &lt;/ns6:ServiceName>&#xa;                &lt;/ns2:SourceService>&#xa;                &lt;ns2:TargetService>&#xa;                    &lt;ns6:ServiceName>&#xa;                        &lt;xsl:value-of select=&quot;$Start/ns:ESBHeader/ns:TargetService/ns5:ServiceName&quot;/>&#xa;                    &lt;/ns6:ServiceName>&#xa;                &lt;/ns2:TargetService>&#xa;                &lt;xsl:if test=&quot;string-length($Start/ns:ESBHeader/ns:Status/ns:State)>0&quot;>&#xa;                    &lt;ns2:Status>&#xa;                        &lt;ns2:State>&#xa;                            &lt;xsl:value-of select=&quot;$Start/ns:ESBHeader/ns:Status/ns:State&quot;/>&#xa;                        &lt;/ns2:State>&#xa;                        &lt;ns2:GeneratingService>&#xa;                            &lt;ns6:ServiceName>&#xa;                                &lt;xsl:value-of select=&quot;$Start/ns:ESBHeader/ns:Status/ns:GeneratingService/ns5:ServiceName&quot;/>&#xa;                            &lt;/ns6:ServiceName>&#xa;                        &lt;/ns2:GeneratingService>&#xa;                        &lt;xsl:if test=&quot;$Start/ns:ESBHeader/ns:Status/ns:StatusCode&quot;>&#xa;                            &lt;ns2:StatusCode>&#xa;                                &lt;xsl:value-of select=&quot;$Start/ns:ESBHeader/ns:Status/ns:StatusCode&quot;/>&#xa;                            &lt;/ns2:StatusCode>&#xa;                        &lt;/xsl:if>&#xa;                        &lt;xsl:if test=&quot;$Start/ns:ESBHeader/ns:Status/ns:Message&quot;>&#xa;                            &lt;ns2:Message>&#xa;                                &lt;xsl:value-of select=&quot;$Start/ns:ESBHeader/ns:Status/ns:Message&quot;/>&#xa;                            &lt;/ns2:Message>&#xa;                        &lt;/xsl:if>&#xa;                    &lt;/ns2:Status>&#xa;                &lt;/xsl:if>&#xa;            &lt;/ns2:ESBHeader>&#xa;            &lt;ns9:Event>&#xa;                &lt;ns10:ResubmissionContext>&#xa;                    &lt;xsl:if test=&quot;$Start/ns8:Event/ns7:ResubmissionContext/ns7:Transport&quot;>&#xa;                        &lt;ns10:Transport>&#xa;                            &lt;xsl:value-of select=&quot;$Start/ns8:Event/ns7:ResubmissionContext/ns7:Transport&quot;/>&#xa;                        &lt;/ns10:Transport>&#xa;                    &lt;/xsl:if>&#xa;                    &lt;xsl:if test=&quot;$Start/ns8:Event/ns7:ResubmissionContext/ns7:Destination&quot;>&#xa;                        &lt;ns10:Destination>&#xa;                            &lt;xsl:value-of select=&quot;$Start/ns8:Event/ns7:ResubmissionContext/ns7:Destination&quot;/>&#xa;                        &lt;/ns10:Destination>&#xa;                    &lt;/xsl:if>&#xa;                    &lt;xsl:if test=&quot;$Start/ns8:Event/ns7:ResubmissionContext/ns7:ReplyTo&quot;>&#xa;                        &lt;ns10:ReplyTo>&#xa;                            &lt;xsl:value-of select=&quot;$Start/ns8:Event/ns7:ResubmissionContext/ns7:ReplyTo&quot;/>&#xa;                        &lt;/ns10:ReplyTo>&#xa;                    &lt;/xsl:if>&#xa;                    &lt;xsl:if test=&quot;$Start/ns8:Event/ns7:ResubmissionContext/ns7:Payload&quot;>&#xa;                        &lt;ns10:Payload>&#xa;                            &lt;xsl:value-of select=&quot;$Start/ns8:Event/ns7:ResubmissionContext/ns7:Payload&quot;/>&#xa;                        &lt;/ns10:Payload>&#xa;                    &lt;/xsl:if>&#xa;                &lt;/ns10:ResubmissionContext>&#xa;                &lt;ns12:ApplicationContext>&#xa;                    &lt;xsl:for-each select=&quot;$Start/ns8:Event/ns11:ApplicationContext/ns11:GenericExtensionData&quot;>&#xa;                        &lt;ns12:GenericExtensionData>&#xa;                            &lt;xsl:attribute name=&quot;name&quot;>&#xa;                                &lt;xsl:value-of select=&quot;ns13:Name&quot;/>&#xa;                            &lt;/xsl:attribute>&#xa;                            &lt;ns14:Value>&#xa;                                &lt;xsl:value-of select=&quot;ns13:Value&quot;/>&#xa;                            &lt;/ns14:Value>&#xa;                        &lt;/ns12:GenericExtensionData>&#xa;                    &lt;/xsl:for-each>&#xa;                &lt;/ns12:ApplicationContext>&#xa;                &lt;ns16:EventContext>&#xa;                    &lt;ns16:EventType>&#xa;                        &lt;xsl:value-of select=&quot;$Start/ns8:Event/ns15:EventContext/ns15:EventType&quot;/>&#xa;                    &lt;/ns16:EventType>&#xa;                    &lt;ns16:Timestamp>&#xa;                        &lt;xsl:value-of select=&quot;$Start/ns8:Event/ns15:EventContext/ns15:Timestamp&quot;/>&#xa;                    &lt;/ns16:Timestamp>&#xa;                    &lt;ns16:AuditStep>&#xa;                        &lt;xsl:value-of select=&quot;$Start/ns8:Event/ns15:EventContext/ns15:AuditStep&quot;/>&#xa;                    &lt;/ns16:AuditStep>&#xa;                    &lt;ns16:AuditText>&#xa;                        &lt;xsl:value-of select=&quot;$Start/ns8:Event/ns15:EventContext/ns15:AuditText&quot;/>&#xa;                    &lt;/ns16:AuditText>&#xa;                    &lt;ns16:Host>&#xa;                        &lt;xsl:value-of select=&quot;$Start/ns8:Event/ns15:EventContext/ns15:Host&quot;/>&#xa;                    &lt;/ns16:Host>&#xa;                    &lt;ns16:EngineName>&#xa;                        &lt;xsl:value-of select=&quot;$Start/ns8:Event/ns15:EventContext/ns15:EngineName&quot;/>&#xa;                    &lt;/ns16:EngineName>&#xa;                    &lt;xsl:if test=&quot;$Start/ns8:Event/ns15:EventContext/ns15:ProcessName&quot;>&#xa;                        &lt;ns16:ProcessName>&#xa;                            &lt;xsl:value-of select=&quot;$Start/ns8:Event/ns15:EventContext/ns15:ProcessName&quot;/>&#xa;                        &lt;/ns16:ProcessName>&#xa;                    &lt;/xsl:if>&#xa;                    &lt;xsl:if test=&quot;$Start/ns8:Event/ns15:EventContext/ns15:ProjectName&quot;>&#xa;                        &lt;ns16:ProjectName>&#xa;                            &lt;xsl:value-of select=&quot;$Start/ns8:Event/ns15:EventContext/ns15:ProjectName&quot;/>&#xa;                        &lt;/ns16:ProjectName>&#xa;                    &lt;/xsl:if>&#xa;                    &lt;xsl:if test=&quot;count($Start/ns8:Event/ns15:EventContext/ns15:EventAnalysisData/ns15:AnalysisData)>0&quot;>&#xa;                        &lt;ns16:EventAnalysisData>&#xa;                            &lt;xsl:for-each select=&quot;$Start/ns8:Event/ns15:EventContext/ns15:EventAnalysisData/ns15:AnalysisData&quot;>&#xa;                                &lt;ns16:AnalysisData>&#xa;                                    &lt;xsl:attribute name=&quot;name&quot;>&#xa;                                        &lt;xsl:value-of select=&quot;ns13:Name&quot;/>&#xa;                                    &lt;/xsl:attribute>&#xa;                                    &lt;ns14:Value>&#xa;                                        &lt;xsl:value-of select=&quot;ns13:Value&quot;/>&#xa;                                    &lt;/ns14:Value>&#xa;                                &lt;/ns16:AnalysisData>&#xa;                            &lt;/xsl:for-each>&#xa;                        &lt;/ns16:EventAnalysisData>&#xa;                    &lt;/xsl:if>&#xa;                    &lt;ns18:ExceptionDetail>&#xa;                        &lt;ns18:ExceptionCode>&#xa;                            &lt;xsl:value-of select=&quot;$Start/ns8:Event/ns15:EventContext/ns17:ExceptionDetail/ns17:ExceptionCode&quot;/>&#xa;                        &lt;/ns18:ExceptionCode>&#xa;                        &lt;ns18:ExceptionMessage>&#xa;                            &lt;xsl:value-of select=&quot;$Start/ns8:Event/ns15:EventContext/ns17:ExceptionDetail/ns17:ExceptionMessage&quot;/>&#xa;                        &lt;/ns18:ExceptionMessage>&#xa;                        &lt;xsl:if test=&quot;$Start/ns8:Event/ns15:EventContext/ns17:ExceptionDetail/ns17:Stacktrace&quot;>&#xa;                            &lt;ns18:Stacktrace>&#xa;                                &lt;xsl:value-of select=&quot;$Start/ns8:Event/ns15:EventContext/ns17:ExceptionDetail/ns17:Stacktrace&quot;/>&#xa;                            &lt;/ns18:Stacktrace>&#xa;                        &lt;/xsl:if>&#xa;                        &lt;xsl:if test=&quot;$Start/ns8:Event/ns15:EventContext/ns17:ExceptionDetail/ns17:ProcessStack&quot;>&#xa;                            &lt;ns18:ProcessStack>&#xa;                                &lt;xsl:value-of select=&quot;$Start/ns8:Event/ns15:EventContext/ns17:ExceptionDetail/ns17:ProcessStack&quot;/>&#xa;                            &lt;/ns18:ProcessStack>&#xa;                        &lt;/xsl:if>&#xa;                    &lt;/ns18:ExceptionDetail>&#xa;                &lt;/ns16:EventContext>&#xa;            &lt;/ns9:Event>&#xa;        &lt;/ns1:LogEventPub>&#xa;    &lt;/xsl:template>&#xa;&lt;/xsl:stylesheet>" expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xslt1.0"/>
+                </tibex:inputBindings>
+                <bpws:targets>
+                    <bpws:target linkName="Log1TologEvent"/>
+                </bpws:targets>
+                <bpws:sources>
+                    <bpws:source linkName="logEventToEnd"/>
+                </bpws:sources>
+            </bpws:invoke>
+            <bpws:extensionActivity>
+                <tibex:activityExtension inputVariable="LogEnd-input"
+                    name="LogEnd"
+                    tibex:xpdlId="ac3a365b-b556-4536-9370-d0bda7fa012a" xmlns:tibex="http://www.tibco.com/bpel/2007/extensions">
+                    <bpws:targets>
+                        <bpws:target linkName="logEventToEnd"/>
+                    </bpws:targets>
+                    <bpws:sources>
+                        <bpws:source linkName="LogToEnd"/>
+                    </bpws:sources>
+                    <tibex:inputBindings>
+                        <tibex:inputBinding
+                            expression="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?>&#xa;&lt;xsl:stylesheet xmlns:xsl=&quot;http://www.w3.org/1999/XSL/Transform&quot; xmlns:tns1=&quot;http://www.tibco.com/pe/WriteToLogActivitySchema&quot; xmlns:ns3=&quot;http://metcash.com.au/ESB/Common/Types/TransactionContext/v3&quot; xmlns:ns=&quot;http://metcash.com.au/ESB/Common/ESBHeader/v3&quot; version=&quot;2.0&quot;>&lt;xsl:param name=&quot;Start&quot;/>&lt;xsl:template name=&quot;LogEnd-input&quot; match=&quot;/&quot;>&lt;tns1:ActivityInput>&lt;message>&lt;xsl:value-of select=&quot;concat(&amp;quot;Log event having transactionID &amp;quot;, $Start/ns:ESBHeader/ns:TransactionContext/ns3:TransactionID, &amp;quot; published to legacy CLE&amp;quot;)&quot;/>&lt;/message>&lt;/tns1:ActivityInput>&lt;/xsl:template>&lt;/xsl:stylesheet>" expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xslt1.0"/>
+                    </tibex:inputBindings>
+                    <tibex:config>
+                        <bwext:BWActivity
+                            activityTypeID="bw.generalactivities.log"
+                            version="6.0.0.001"
+                            xmlns:activityconfig="http://tns.tibco.com/bw/model/activityconfig"
+                            xmlns:bwext="http://tns.tibco.com/bw/model/core/bwext"
+                            xmlns:generalactivities="http://ns.tibco.com/bw/palette/generalactivities" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                            <activityConfig>
+                                <properties name="config" xsi:type="activityconfig:EMFProperty">
+                                    <type href="http://ns.tibco.com/bw/palette/generalactivities#//Log"/>
+                                    <value role="Info"
+                                    suppressJobInfo="true" xsi:type="generalactivities:Log"/>
+                                </properties>
+                            </activityConfig>
+                        </bwext:BWActivity>
+                    </tibex:config>
+                </tibex:activityExtension>
+            </bpws:extensionActivity>
+            <bpws:extensionActivity>
+                <tibex:activityExtension inputVariable="LogStart-input"
+                    name="LogStart"
+                    tibex:xpdlId="b47d5f9e-9913-4b3d-884b-97318025cc00" xmlns:tibex="http://www.tibco.com/bpel/2007/extensions">
+                    <bpws:targets>
+                        <bpws:target linkName="StartTologEvent"/>
+                    </bpws:targets>
+                    <bpws:sources>
+                        <bpws:source linkName="Log1TologEvent"/>
+                    </bpws:sources>
+                    <tibex:inputBindings>
+                        <tibex:inputBinding
+                            expression="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?>&#xa;&lt;xsl:stylesheet xmlns:xsl=&quot;http://www.w3.org/1999/XSL/Transform&quot; xmlns:tns1=&quot;http://www.tibco.com/pe/WriteToLogActivitySchema&quot; xmlns:ns3=&quot;http://metcash.com.au/ESB/Common/Types/TransactionContext/v3&quot; xmlns:ns=&quot;http://metcash.com.au/ESB/Common/ESBHeader/v3&quot; version=&quot;2.0&quot;>&lt;xsl:param name=&quot;Start&quot;/>&lt;xsl:template name=&quot;LogStart-input&quot; match=&quot;/&quot;>&lt;tns1:ActivityInput>&lt;message>&lt;xsl:value-of select=&quot;concat(&amp;quot;Publishing log event with transactionID &amp;quot;, $Start/ns:ESBHeader/ns:TransactionContext/ns3:TransactionID, &amp;quot; to legacy CLE&amp;quot;)&quot;/>&lt;/message>&lt;/tns1:ActivityInput>&lt;/xsl:template>&lt;/xsl:stylesheet>" expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xslt1.0"/>
+                    </tibex:inputBindings>
+                    <tibex:config>
+                        <bwext:BWActivity
+                            activityTypeID="bw.generalactivities.log"
+                            version="6.0.0.001"
+                            xmlns:activityconfig="http://tns.tibco.com/bw/model/activityconfig"
+                            xmlns:bwext="http://tns.tibco.com/bw/model/core/bwext"
+                            xmlns:generalactivities="http://ns.tibco.com/bw/palette/generalactivities" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                            <activityConfig>
+                                <properties name="config" xsi:type="activityconfig:EMFProperty">
+                                    <type href="http://ns.tibco.com/bw/palette/generalactivities#//Log"/>
+                                    <value role="Info"
+                                    suppressJobInfo="true" xsi:type="generalactivities:Log"/>
+                                </properties>
+                            </activityConfig>
+                        </bwext:BWActivity>
+                    </tibex:config>
+                </tibex:activityExtension>
+            </bpws:extensionActivity>
+        </bpws:flow>
+    </bpws:scope>
+</bpws:process>

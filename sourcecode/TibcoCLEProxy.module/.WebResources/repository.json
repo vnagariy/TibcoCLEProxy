@@ -1,0 +1,17 @@
+{
+    "records": [{
+        "name": "Cloud",
+        "items": [],
+        "url": "https://integration.cloud.tibco.com:443"
+    }],
+    "resources": [
+        {
+            "location": "Service Descriptors/com.metcash.tibcocleproxy.interface.CleProxyInterfaceImpl-CLEProxy.json",
+            "type": "generated"
+        },
+        {
+            "location": "Service Descriptors/com.metcash.tibcocleproxy.interface.CleProxyImpl-CLEProxy.json",
+            "type": "generated"
+        }
+    ]
+}

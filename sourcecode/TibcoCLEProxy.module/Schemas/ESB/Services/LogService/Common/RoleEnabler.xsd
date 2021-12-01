@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xsd:schema xmlns="http://metcash.com.au/ESB/Services/LogService/Common/RoleEnabler/v3"
+	 xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	 targetNamespace="http://metcash.com.au/ESB/Services/LogService/Common/RoleEnabler/v3"
+	 elementFormDefault="qualified"
+	 attributeFormDefault="unqualified">
+	<xsd:complexType name="RoleEnablerType">
+		<xsd:sequence>
+			<xsd:element name="debugRoleEnabler" type="xsd:boolean"/>
+			<xsd:element name="infoRoleEnabler" type="xsd:boolean"/>
+			<xsd:element name="warnRoleEnabler" type="xsd:boolean"/>
+			<xsd:element name="errorRoleEnabler" type="xsd:boolean"/>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:element name="RoleEnabler" type="RoleEnablerType">
+	</xsd:element>
+
+</xsd:schema>

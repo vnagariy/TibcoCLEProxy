@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xsd:schema xmlns="http://metcash.com.au/ESB/Common/ESBHeader/v3" 
+xmlns:svcid="http://metcash.com.au/ESB/Common/Types/ServiceIdentifier/v3" 
+xmlns:txcxt="http://metcash.com.au/ESB/Common/Types/TransactionContext/v3" 
+xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+attributeFormDefault="unqualified" 
+elementFormDefault="qualified" 
+targetNamespace="http://metcash.com.au/ESB/Common/ESBHeader/v3" version="1.0" xml:lang="en">
+    <xsd:import namespace="http://metcash.com.au/ESB/Common/Types/ServiceIdentifier/v3" schemaLocation="../Types/ServiceIdentifier.xsd" />
+    <xsd:import namespace="http://metcash.com.au/ESB/Common/Types/TransactionContext/v3" schemaLocation="../Types/TransactionContext.xsd"/>
+	<xsd:element name="ESBHeader">
+		<xsd:annotation>
+			<xsd:documentation>The root of the CIM is namespace controlled by version</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="TransactionContext" type="txcxt:TransactionContextType">
+					<xsd:annotation>
+						<xsd:documentation>TransactionContext is used to manage correlating responses to request and log entries</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element name="SourceService" type="svcid:ServiceIdentifierType">
+					<xsd:annotation>
+						<xsd:documentation>The service which created the message</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element minOccurs="0" name="TargetService" type="svcid:ServiceIdentifierType">
+					<xsd:annotation>
+						<xsd:documentation>The service which is the target of this message</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element minOccurs="0" name="Status" type="StatusType">
+					<xsd:annotation>
+						<xsd:documentation>Optional generic status used in responses</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="StatusType">
+		<xsd:annotation>
+			<xsd:documentation>A Status object contains information about processing status</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element minOccurs="0" name="State" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>The State element content is restricted to a fixed set of strings indicating the overall status. For example, "Success" and "Error" are defined as valid content.</xsd:documentation>
+				</xsd:annotation>
+				<!-- xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:enumeration value="Success"/>
+						<xsd:enumeration value="Error"/>
+					</xsd:restriction>
+				</xsd:simpleType-->
+			</xsd:element>
+			<xsd:element minOccurs="0" name="GeneratingService" type="svcid:ServiceIdentifierType">
+				<xsd:annotation>
+					<xsd:documentation>This is the service generating the status</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element minOccurs="0" name="StatusCode" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>StatusCode is a string which corresponds with a particular state. Often, a status code is associated with a message.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element minOccurs="0" name="Message" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>An informational message providing further detail about status</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

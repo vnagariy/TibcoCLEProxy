@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jndi:namedResource xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:httpconnector="http://xsd.tns.tibco.com/bw/models/sharedresource/httpconnector" xmlns:jndi="http://xsd.tns.tibco.com/amf/models/sharedresource/jndi" xmi:id="_DMoHUY1XEeuxjdOGaB0vbw" name="com.metcash.tibcocleproxy.interface.HttpConnInterface" type="httpconnector:HttpConnectorConfiguration">
+  <jndi:configuration xsi:type="httpconnector:HttpConnectorConfiguration" xmi:id="_DMqjkI1XEeuxjdOGaB0vbw">
+    <substitutionBindings xmi:id="_yu8NAMtIEeu6_4CKkTzKmA" template="host" propName="/Properties/Interface/HTTPConnection/Host"/>
+    <substitutionBindings xmi:id="_0ebNoMtIEeu6_4CKkTzKmA" template="port" propName="/Properties/Interface/HTTPConnection/Port"/>
+  </jndi:configuration>
+</jndi:namedResource>
